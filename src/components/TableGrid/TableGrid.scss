@@ -1,0 +1,37 @@
+.table-grid{
+  .table-grid-operation{
+    margin: 0 5px;
+  }
+}
+.table-row-selection{
+  border: 1px solid #bcddf3;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  background-color:rgba(230, 243, 252, 1);
+  padding: 5px 10px;
+  margin-bottom: 5px;
+}
+.editable-cell{
+  .ant-input{
+    border-color: #d9d9d9;
+  }
+}
+.editable-cell-error{
+  .ant-input{
+    border-color: #f50;
+  }
+  .ant-input:focus{
+    outline: 0;
+    box-shadow: 0 0 0 2px rgba(255,0,0,.2);
+  }
+  .editable-validate-msg{
+    position: absolute;
+    top:23px;
+    color: #f50;
+    white-space:nowrap;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}

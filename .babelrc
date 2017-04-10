@@ -1,0 +1,7 @@
+{
+  "presets": ["es2015", "stage-0", "react"],// presets字段设定转码规则
+  "plugins": [
+    "transform-runtime",
+    ["import", { "libraryName": "antd", "style": "css" }]
+  ]
+}

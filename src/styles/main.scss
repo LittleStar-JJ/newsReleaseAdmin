@@ -1,0 +1,50 @@
+.loading-bar{
+  display: block;
+  position: fixed;
+  z-index:9999;
+  top:0;
+  left:0;
+  width: 0%;
+  height: 1.6px;
+  background: linear-gradient(to right,#9bfbc1,#07aaf3);
+  background: -webkit-linear-gradient(to right,#9bfbc1,#07aaf3);
+  background: -o-linear-gradient(to right,#9bfbc1,#07aaf3);
+  background: -moz-linear-gradient(to right,#9bfbc1,#07aaf3);
+}
+.ant-layout-main{
+  min-height: 100%;
+  background: {
+
+  }
+  .ant-layout-breadcrumb{
+    height: 50px;
+    margin: 0 0 -17px 0px;
+    background-color: white;
+    padding-left: 20px;
+    padding-top: 15px;
+    span{
+      font-size: 16px;
+      color: #999999;
+      margin-top: 5px;
+
+    }
+  }
+}
+
+// 录入页面样式
+.page-detail{
+  overflow: hidden;
+  min-height: 100%;
+  background-color: white;
+}
+.page-detail-left{
+  float: left;
+  width: 28%;
+  border-right: 3px solid #f4f4f4;
+  padding-right: 20px;
+}
+.page-detail-right{
+  width: 70%;
+  float: left;
+  padding-left: 40px;
+}

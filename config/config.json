@@ -1,0 +1,31 @@
+{
+  "DEVELOPMENT" : {
+    "cdnHost"               : "http://localhost",
+    "apiHost"               : "http://devapi.test.oborexpress.com",
+    "port"                  : 3001,
+    "compiler_public_path"  : "http://localhost:8082/"
+  },
+
+  "PRODUCTION" : {
+    "cdnHost"     : "http://consignor.test.oborexpress.com",
+    "apiHost"     : "http://api.test.oborexpress.com",
+    "port"        : "",
+    "compiler_public_path"  : "http://consignor.test.oborexpress.com/",
+    "compiler_fail_on_warning"  : false,
+    "compiler_hash_type"        : "chunkhash",
+    "compiler_devtool"          : null,
+    "compiler_stats"            : {
+      "chunks"       : true,
+      "chunkModules" : true,
+      "colors"       : true
+    }
+  },
+
+  "APP_TITLE"     : "news-release-admin",
+  "ENTRY"         : "main.js",
+  "SRC_DIR"       : "src",
+  "TEMPLATES_DIR" : "templates",
+  "ASSETS_DIR"    : "assets",
+  "BUILD_DIR"     : "dist",
+  "BANNER"        : "jerry inc."
+}

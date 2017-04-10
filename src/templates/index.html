@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <title></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/compatibility.js"></script>
+    <!--[if lt IE 10]>
+    <script src="/shim.js"></script>
+    <![endif]-->
+    <script src="/es6-promise.min.js"></script>
+</head>
+<body>
+<div id="root" style="height: 100%"></div>
+<script>
+    if (!window.Promise) {
+        window.Promise = Promise;
+    }
+</script>
+</body>
+</html>

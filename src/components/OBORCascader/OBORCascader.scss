@@ -1,0 +1,20 @@
+.obor-cascade{
+  position: relative;
+  .obor-cascade-validator{
+    position: absolute;
+    top: 25px;
+    color: #f50;
+    display: none;
+  }
+  .ant-input,.ant-select-selection{
+    border-color: #d9d9d9;
+  }
+}
+.obor-cascade.cascade-has-error{
+  .obor-cascade-validator{
+    display: block;
+  }
+  .ant-input,.ant-select-selection{
+    border-color: #f50;
+  }
+}

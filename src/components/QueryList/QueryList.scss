@@ -1,0 +1,18 @@
+.query-list-from{
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f7f7f7;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  .has-error .ant-form-explain{
+    position: absolute;
+  }
+  .ant-form-item-label{
+    text-overflow: initial;
+    white-space: initial;
+  }
+}
+.query-list-from-edit{
+  border: 0;
+  background-color: inherit;
+}

@@ -1,0 +1,40 @@
+{
+  "parser": "babel-eslint",// 需要Babel进行前置转码
+  "extends": [
+    "standard",
+    "standard-react"
+  ],
+  "plugins": [
+    "babel",
+    "react",
+    "promise"
+  ],
+  "env": {
+    "browser" : true
+  },
+  "globals": {
+    "NODE_ENV"      : "",
+    "__DEV__"      : false,
+    "__QA__"      : false,
+    "__TEST__"     : false,
+    "__PROD__"     : false
+  },
+  "rules": {
+    "key-spacing"          : 0,
+    "jsx-quotes"           : [2, "prefer-double"],
+    "react/jsx-indent"     : [2, 4],
+    "max-len"              : [2, 220, 2],
+    "indent"               : ["error", 4, {"SwitchCase":1}],
+    "object-curly-spacing" : [2, "always"],
+    "space-before-function-paren" : ["error", "never"],
+    "operator-linebreak": ["error", "after"],
+    "no-unused-vars":0,
+    "no-unused-prop-types": 0,
+    "react/no-unused-prop-types": 0,
+    "no-undef": 0,
+    "no-unreachable": 0,
+    "no-new-wrappers": 1,
+    "no-eval": 0,
+    "no-useless-call": 0
+  }
+}
