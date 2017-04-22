@@ -1,28 +1,38 @@
 import { CALL_API } from '../../../../middleware/api'
 import { CommonAction } from '../../../../constants/ActionTypes'
 
-const CLEAR_CLASSIFYS = 'CLEAR_CLASSIFYS'
-const RECEIVE_CLASSIFY_LIST = 'RECEIVE_CLASSIFY_LIST'
+const CLEAR_NEWS = 'CLEAR_NEWS'
+const RECEIVE_NEWS_LIST = 'RECEIVE_NEWS_LIST'
 import { BookApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
-        type: CLEAR_CLASSIFYS
+        type: CLEAR_NEWS
     }
 }
-export function getClassifyList(query) {
+export function getList(query) {
     return {
         /* [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_AUTHORITY_LIST, CommonAction.REQUEST_FAILURE + 'CLEAR_CLASSIFYS' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_NEWS_LIST, CommonAction.REQUEST_FAILURE + 'USER' ],
             endpoint: BookApi.getList,
             options: { body: query, method:'GET' }
         } */
-        type: 'RECEIVE_CLASSIFY_LIST',
+        type: 'RECEIVE_NEWS_LIST',
         response: {
             data: [{
                 id:1,
-                name:1,
-                createdAt:12222222222222
+                title:1,
+                author:2,
+                category:{
+                    id: 1,
+                    name:'男'
+                },
+                createdAt:12222222222222,
+                source:12222222222222,
+                keyWords:1,
+                accessCount:1,
+                isTop:1,
+                status:'ENABLE'
             }]
         }
     }
@@ -30,17 +40,17 @@ export function getClassifyList(query) {
 
 const initialState = {
     fetching:false,
-    classifyList:null,
+    news:null,
     error:null
 }
 const ACTION_HANDLERS = {
     [CommonAction.REQUEST_FAILURE + 'USER']: (state, action) => {
         return ({ ...state, fetching: false, error: action })
     },
-    [RECEIVE_CLASSIFY_LIST] : (state, action) => {
-        return ({ ...state, fetching: false, classifyList: action.response.data, error: null })
+    [RECEIVE_NEWS_LIST] : (state, action) => {
+        return ({ ...state, fetching: false, news: action.response.data, error: null })
     },
-    [CLEAR_CLASSIFYS] : () => {
+    [CLEAR_NEWS] : () => {
         return ({ ...initialState })
     }
 }

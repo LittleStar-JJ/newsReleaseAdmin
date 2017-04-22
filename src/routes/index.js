@@ -13,6 +13,12 @@ import AuthorityList from './AuthorityManage/AuthorityList'
 import AuthorityEdit from './AuthorityManage/AuthorityEdit'
 import ClassifyList from './ClassifyManage/ClassifyList'
 import ClassifyEdit from './ClassifyManage/ClassifyEdit'
+import NewsList from './NewsManage/NewsList'
+import NewsEdit from './NewsManage/NewsEdit'
+import LinksList from './WebsiteManage/LinksList'
+import SiteConfig from './WebsiteManage/SiteConfig'
+import CommentList from './CommentManage/CommentList'
+import CommentEdit from './CommentManage/CommentEdit'
 
 export const createRoutes = (store) => ([
     {
@@ -26,7 +32,13 @@ export const createRoutes = (store) => ([
             AuthorityList(store),
             AuthorityEdit(store),
             ClassifyList(store),
-            ClassifyEdit(store)
+            ClassifyEdit(store),
+            NewsList(store),
+            NewsEdit(store),
+            LinksList(store),
+            SiteConfig(store),
+            CommentList(store),
+            CommentEdit(store)
 
         ]
     },

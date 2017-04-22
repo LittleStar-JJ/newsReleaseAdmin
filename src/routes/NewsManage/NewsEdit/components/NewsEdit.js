@@ -4,16 +4,16 @@ import { Button, Popconfirm, message, Form, Row, Col } from 'antd'
 import OBOREdit from '../../../../components/OBOREdit'
 import { QuotePlanStatus, genderStatus } from '../../../../constants/Status'
 
-class UesrEdit extends React.Component {
+class NewsEdit extends React.Component {
     static propTypes = {
         form: React.PropTypes.object,
         params: React.PropTypes.object,
-        UesrEdit: React.PropTypes.object,
+        NewsEdit: React.PropTypes.object,
 
         clearState: React.PropTypes.func,
-        getUesrById: React.PropTypes.func,
-        createUser: React.PropTypes.func,
-        updateUser: React.PropTypes.func
+        getNewsById: React.PropTypes.func,
+        createNews: React.PropTypes.func,
+        updateNews: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
@@ -24,24 +24,24 @@ class UesrEdit extends React.Component {
         this.id = id
     }
     state = {
-        userDetail: {},
+        classifyDetail: {},
         disabled:false,
         create:{},
         update:{}
     }
     componentWillMount() {
         if (this.id) {
-            this.props.getUesrById(this.id)
+            //  this.props.getNewsById(this.id)
         }
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.UesrEdit.userDetail) {
-            const userDetail = nextProps.UesrEdit.userDetail
-            this.setState({ userDetail: userDetail })
+        if (nextProps.NewsEdit.newsDetail) {
+            const newsDetail = nextProps.NewsEdit.newsDetail
+            this.setState({ newsDetail: newsDetail })
             this.props.clearState()
         }
-        if (nextProps.UesrEdit.error) {
-            message.error(nextProps.UesrEdit.error.error)
+        if (nextProps.NewsEdit.error) {
+            message.error(nextProps.NewsEdit.error.error)
             this.props.clearState()
         }
     }
@@ -53,37 +53,67 @@ class UesrEdit extends React.Component {
         return arr
     }
     render() {
-        // const { getFieldDecorator } = this.props.form
-        const userDetail = this.state.userDetail || {}
+        const newsDetail = this.state.newsDetail || {}
+        const optionsWithDisabled = [
+            { label: 'Apple', value: 'Apple' },
+            { label: 'Pear', value: 'Pear' },
+            { label: 'Orange', value: 'Orange', disabled: false }
+        ]
         const options = [
             {
                 type:'text',
                 rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'昵称',
+                fieldLabel:'标题',
                 disabled:this.state.disabled,
-                fieldName:'nickName',
+                fieldName:'title',
                 placeholder:'请输入',
-                initialValue:userDetail.nickName,
+                initialValue:newsDetail.name,
                 onChange:() => {}
             },
             {
                 type:'text',
                 rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'邮箱',
+                fieldLabel:'关键字',
                 disabled:this.state.disabled,
-                fieldName:'email',
+                fieldName:'keyWords',
                 placeholder:'请输入',
-                initialValue:userDetail.email,
+                initialValue:newsDetail.path,
                 onChange:() => {}
             },
             {
-                type:'password',
+                type:'textArea',
+                style:{ height:'60px' },
                 rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'密码',
+                fieldLabel:'摘要',
                 disabled:this.state.disabled,
-                fieldName:'password',
+                fieldName:'summary',
                 placeholder:'请输入',
-                initialValue:userDetail.password,
+                initialValue:newsDetail.path,
+                onChange:() => {}
+            },
+            {
+                type:'selectSearch',
+                rules:[{ required:true, message:'请选择' }],
+                option:{
+                    valueField:'id',
+                    textField:'name',
+                    placeholder:'请选择',
+                    options:this.convertStatus(QuotePlanStatus),
+                    selected:newsDetail.category,
+                    onChange:(val) => {}
+                },
+                disabled:false,
+                fieldLabel:'分类',
+                fieldName:'category.id'
+            },
+            {
+                type:'editor',
+                rules:[{ required:true, message:'请输入' }],
+                fieldLabel:'摘要',
+                disabled:this.state.disabled,
+                fieldName:'content',
+                placeholder:'请输入',
+                initialValue:newsDetail.content,
                 onChange:() => {}
             },
             {
@@ -94,7 +124,7 @@ class UesrEdit extends React.Component {
                     textField:'name',
                     placeholder:'请选择',
                     options:this.convertStatus(QuotePlanStatus),
-                    selected:userDetail.status,
+                    selected:newsDetail.status,
                     onChange:(val) => {}
                 },
                 disabled:false,
@@ -102,78 +132,41 @@ class UesrEdit extends React.Component {
                 fieldName:'status'
             },
             {
-                type:'text',
-                rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'手机号',
-                disabled:this.state.disabled,
-                fieldName:'phone',
-                placeholder:'请输入',
-                initialValue:userDetail.phone,
-                onChange:() => {}
-            },
-            {
-                type:'radioButton',
-                disabled:this.state.disabled,
-                rules:[{ required:true, message:'请选择' }],
+                type:'switch',
+                fieldLabel:'是否轮播',
+                fieldName:'isCarousel',
                 option:{
-                    valueField:'id',
-                    textField:'name',
-                    placeholder:'请选择',
-                    options:this.convertStatus(genderStatus),
-                    selected:userDetail.gender ? userDetail.gender.id : 'MALE',
+                    checked:'启用', // 启用显示文本
+                    unChecked:'禁用', // 关闭显示文本
+                    initialValue: newsDetail.isCarousel || false, // 默认值（true/false）
                     onChange:(val) => {}
-                },
-                fieldLabel:'性别',
-                fieldName:'gender'
+                }
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'联系地址',
+                fieldLabel:'作者',
                 disabled:this.state.disabled,
-                fieldName:'address',
+                fieldName:'author',
                 placeholder:'请输入',
-                initialValue:userDetail.address,
+                initialValue:newsDetail.author,
                 onChange:() => {}
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
-                fieldLabel:'QQ',
+                fieldLabel:'来源',
                 disabled:this.state.disabled,
-                fieldName:'qq',
+                fieldName:'source',
                 placeholder:'请输入',
-                initialValue:userDetail.qq,
-                onChange:() => {}
-            },
-            {
-                type:'datePicker',
-                rules:[{ required:true, message:'请选择' }],
-                disabled:this.state.disabled,
-                fieldLabel:'生日',
-                fieldName:'birthday',
-                initialValue:moment(userDetail.birthday),
-                placeholder:'请选择',
+                initialValue:newsDetail.author,
                 onChange:() => {}
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
+                fieldLabel:'访问数',
                 disabled:this.state.disabled,
-                fieldLabel:'积分',
-                fieldName:'integral',
+                fieldName:'accessCount',
                 placeholder:'请输入',
-                initialValue:userDetail.integral,
-                onChange:() => {}
-            },
-            {
-                type:'textArea',
-                style:{ height:'60px' },
-                placeholder:'介绍（Introduction）',
-                disabled:this.state.disabled,
-                fieldLabel:'介绍',
-                fieldName:'receiver',
-                initialValue:userDetail.introduction,
+                initialValue:newsDetail.author,
                 onChange:() => {}
             }
         ]
@@ -198,16 +191,15 @@ class UesrEdit extends React.Component {
 
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value) => {
-            value.birthday = value.birthday.format('x')
             console.log('aaaaaa', value)
             if (!this.id) {
-                this.props.createUser({ freightBill:JSON.stringify(book) })
+                this.props.createNews({ freightBill:JSON.stringify(value) })
             } else {
                 book.id = this.id
-                this.props.updateUser({ freightBill:JSON.stringify(book) })
+                this.props.updateNews({ freightBill:JSON.stringify(value) })
             }
         })
     }
 }
 
-export default Form.create()(UesrEdit)
+export default Form.create()(NewsEdit)

@@ -6,7 +6,7 @@ export default (store) => ({
         require.ensure([], (require) => {
             const ClassifyList = require('./containers/ClassifyListContainer').default
             const reducer = require('./modules/classifyList').default
-            injectReducer(store, { key: 'AuthorityList', reducer })
+            injectReducer(store, { key: 'ClassifyList', reducer })
             cb(null, ClassifyList)
         })
     }

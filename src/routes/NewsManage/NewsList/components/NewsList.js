@@ -4,17 +4,17 @@ import moment from 'moment'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import { QuotePlanStatus } from '../../../../constants/Status'
-export default class UserList extends React.Component {
+export default class NewsList extends React.Component {
     static propTypes = {
-        UserList: React.PropTypes.object,
-        getUserList: React.PropTypes.func,
+        NewsList: React.PropTypes.object,
+        getList: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
     }
     state = {
-        users: [],
+        news: [],
         isClearRowKeys:false
     }
     constructor(props) {
@@ -24,8 +24,8 @@ export default class UserList extends React.Component {
         this.pageTotalElement = 0
         this.query = {}
     }
-    getUsers = () => {
-        this.props.getUserList({ page: this.pageNum, size: this.pageSize, ...this.query })
+    getNews = () => {
+        this.props.getList({ page: this.pageNum, size: this.pageSize, ...this.query })
     }
     handleSearch = (value) => {
         let _datas1 = []
@@ -35,45 +35,26 @@ export default class UserList extends React.Component {
             })
             value.createdAt = _datas1.join('-')
         }
-        let _datas2 = []
-        if (value.loginTime) {
-            value.loginTime.forEach((data) => {
-                _datas2.push(data.format('x'))
-            })
-            value.loginTime = _datas2.join('-')
-        }
         this.pageNum = 1
         this.query = value
-        this.getUsers()
-    }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
+        this.getNews()
     }
     componentWillMount() {
-        this.getUsers()
+        this.getNews()
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.UserList.users) {
-            this.pageTotalElement = nextProps.UserList.users.totalElement
-            const users = nextProps.UserList.users
-            users.map((item) => {
+        if (nextProps.NewsList.news) {
+            this.pageTotalElement = nextProps.NewsList.news.totalElement
+            const contenet = nextProps.NewsList.news
+            contenet.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                item.loginTime = moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')
                 item.statusName = QuotePlanStatus[item.status]
             })
-            this.setState({ users: users, isClearRowKeys:false })
+            this.setState({ news: contenet, isClearRowKeys:false })
             this.props.clearState()
         }
-        if (nextProps.UserList.error) {
-            message.error(nextProps.UserList.error.error)
+        if (nextProps.NewsList.error) {
+            message.error(nextProps.NewsList.error.error)
             this.props.clearState()
         }
     }
@@ -85,18 +66,30 @@ export default class UserList extends React.Component {
         return arr
     }
     render() {
-        const users = this.state.users || []
+        const news = this.state.news || []
         const queryOptions = [
             {
                 type:'text',
-                fieldLabel:'用户名',
-                fieldName:'adminName',
+                fieldLabel:'标题',
+                fieldName:'title',
                 onChange:() => {}
             },
             {
+                type:'selectSearch',
+                option:{
+                    valueField:'id',
+                    textField:'name',
+                    placeholder:'请选择',
+                    options:this.convertStatus(QuotePlanStatus),
+                    onChange:(val) => {}
+                },
+                fieldLabel:'分类',
+                fieldName:'category.id'
+            },
+            {
                 type:'text',
-                fieldLabel:'邮箱',
-                fieldName:'email',
+                fieldLabel:'作者',
+                fieldName:'author',
                 initialValue:'',
                 onChange:() => {}
             },
@@ -116,42 +109,46 @@ export default class UserList extends React.Component {
                 type:'rangePicker',
                 initialValue:[],
                 onChange:(val) => { console.log(val) },
-                fieldLabel:'创建时间',
+                fieldLabel:'添加时间',
                 fieldName:'createdAt'
             }
         ]
         const gridColumns = [
             {
-                title: '昵称', // 标题
-                dataIndex: 'nickName' // 字段名称
+                title: '标题', // 标题
+                dataIndex: 'title' // 字段名称
             },
             {
-                title: '邮箱', // 标题
-                dataIndex: 'email' // 字段名称
+                title: '分类', // 标题
+                dataIndex: 'category.name' // 字段名称
             },
             {
-                title: '性别', // 标题
-                dataIndex: 'gender.name' // 字段名称
+                title: '作者', // 标题
+                dataIndex: 'author' // 字段名称
             },
             {
-                title: '创建时间', // 标题
-                dataIndex: 'createdAt' // 字段名称
+                title: '来源', // 标题
+                dataIndex: 'source' // 字段名称
             },
             {
-                title: '登录时间', // 标题
-                dataIndex: 'loginTime' // 字段名称
+                title: '关键字', // 标题
+                dataIndex: 'keyWords' // 字段名称
             },
             {
-                title: '积分', // 标题
-                dataIndex: 'integral' // 字段名称
+                title: '访问数', // 标题
+                dataIndex: 'accessCount' // 字段名称
             },
             {
-                title: '登录IP', // 标题
-                dataIndex: 'loginIP' // 字段名称
+                title: '置顶标记', // 标题
+                dataIndex: 'isTop' // 字段名称
             },
             {
                 title: '状态', // 标题
                 dataIndex: 'statusName' // 字段名称
+            },
+            {
+                title: '添加时间', // 标题
+                dataIndex: 'createdAt' // 字段名称
             },
             {
                 title: '操作',
@@ -165,7 +162,7 @@ export default class UserList extends React.Component {
                             field:'status',
                             actions: []
                         },
-                        onClick:(index) => { this.context.router.push('/userEdit/' + users[index].id) }
+                        onClick:(index) => { this.context.router.push('/newsEdit/' + news[index].id) }
                     }
                 ]
             }
@@ -177,23 +174,23 @@ export default class UserList extends React.Component {
             onShowSizeChange: (current, pageSize) => {
                 this.pageSize = pageSize
                 this.pageNum = current
-                this.getUsers()
+                this.getNews()
             },
             onChange: (current) => {
                 this.pageNum = current
-                this.getUsers()
+                this.getNews()
             }
         }
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/userEdit')}>会员创建</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/userEdit')}>新闻添加</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
                 </div>
                 <div className="page-tabs-table">
-                    <TableGrid columns={gridColumns} dataSource={users}
+                    <TableGrid columns={gridColumns} dataSource={news}
                       pagination={pagination} isClearRowKeys={this.state.isClearRowKeys} />
                 </div>
             </div>

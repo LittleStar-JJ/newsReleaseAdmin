@@ -1,39 +1,39 @@
 import { CALL_API } from '../../../../middleware/api'
 import { CommonAction } from '../../../../constants/ActionTypes'
 
-const CLEAR_BOOKEDIT = 'CLEAR_BOOKEDIT'
-const RECEIVE_USER = 'RECEIVE_USER'
+const CLEAR_CLASS_EDIT = 'CLEAR_CLASS_EDIT'
+const RECEIVE_CLASS_EDIT = 'RECEIVE_CLASS_EDIT'
 const RECEIVE_CREATE = 'RECEIVE_CREATE'
 const RECEIVE_UPDATE = 'RECEIVE_UPDATE'
 import { BookApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
-        type: CLEAR_BOOKEDIT
+        type: CLEAR_CLASS_EDIT
     }
 }
-export function getUesrById(id) {
+export function getClassifyById(id) {
     return {
         [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_USER, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_CLASS_EDIT, CommonAction.REQUEST_FAILURE + 'CLASSEDIT' ],
             endpoint: BookApi.getUesrById(id),
             options: { method:'GET' }
         }
     }
 }
-export function createUser(p) {
+export function createClassify(p) {
     return {
         [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE, CommonAction.REQUEST_FAILURE + 'CLASSEDIT' ],
             endpoint: BookApi.createUser,
             options: { body:p, method:'POST' }
         }
     }
 }
-export function updateUser(p) {
+export function updateClassify(p) {
     return {
         [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE, CommonAction.REQUEST_FAILURE + 'CLASSEDIT' ],
             endpoint: BookApi.updateUser,
             options: { body:p, method:'POST' }
         }
@@ -42,17 +42,17 @@ export function updateUser(p) {
 
 const initialState = {
     fetching:false,
-    userDetail:null,
+    classifyDetail:null,
     create:null,
     update:null,
     error:null
 }
 const ACTION_HANDLERS = {
-    [CommonAction.REQUEST_FAILURE + 'BOOKEDIT']: (state, action) => {
+    [CommonAction.REQUEST_FAILURE + 'CLASSEDIT']: (state, action) => {
         return ({ ...state, fetching: false, error: action })
     },
-    [RECEIVE_USER] : (state, action) => {
-        return ({ ...state, fetching: false, userDetail: action.response.data, error: null })
+    [RECEIVE_CLASS_EDIT] : (state, action) => {
+        return ({ ...state, fetching: false, classifyDetail: action.response.data, error: null })
     },
     [RECEIVE_CREATE] : (state, action) => {
         return ({ ...state, fetching: false, create: action.response.data, error: null })
@@ -60,7 +60,7 @@ const ACTION_HANDLERS = {
     [RECEIVE_UPDATE] : (state, action) => {
         return ({ ...state, fetching: false, update: action.response.data, error: null })
     },
-    [CLEAR_BOOKEDIT] : () => {
+    [CLEAR_CLASS_EDIT] : () => {
         return ({ ...initialState })
     }
 }

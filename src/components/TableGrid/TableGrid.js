@@ -8,7 +8,7 @@ import TableEditInput from '../../components/TableEditInput'
 import TableEditSelect from '../../components/TableEditSelect'
 import TableEditInputSearch from '../../components/TableEditInputSearch'
 
-class TableGrid extends React.Component {
+export default class TableGrid extends React.Component {
     static propTypes = {
         columns: React.PropTypes.array.isRequired,
         dataSource: React.PropTypes.array,
@@ -17,6 +17,7 @@ class TableGrid extends React.Component {
         expandedRowKeys: React.PropTypes.array,
         expandedRowRender: React.PropTypes.any,
         scroll: React.PropTypes.object,
+        // clearCallBack: React.PropTypes.func,
         isClearRowKeys: React.PropTypes.bool // 是否清除选择的数据
     }
     constructor(props) {
@@ -63,6 +64,9 @@ class TableGrid extends React.Component {
             this.setState({ editable:editable, data: data, expandedRowKeys: this.props.expandedRowKeys || [] })
         }
     }
+    componentWillMount() {
+        // this.props.clearCallBack(this.clearSelectedAll)
+    }
     componentWillReceiveProps(nextProps) {
         if (nextProps.dataSource) {
             this.catchColumns = nextProps.columns
@@ -95,7 +99,7 @@ class TableGrid extends React.Component {
     _setColumns(columns, data) {
         columns.forEach((item) => {
             const editable = item.editable
-            if (editable) {
+            if (editable && !item.render) {
                 switch (editable.type) {
                     case 'input':
                         item['render'] = (text, record, index) => this._renderInput(editable, data, index, item.dataIndex, text)
@@ -113,9 +117,9 @@ class TableGrid extends React.Component {
                         item['render'] = (text, record, index) => this._renderText(editable, data, index, item.dataIndex, text)
                         break
                 }
-            } else if (item.type === 'operation') {
+            } else if (item.type === 'operation' && !item.render) {
                 item['render'] = (text, record, index) => this._renderBtns(item.btns, data, index, item.dataIndex, text)
-            } else {
+            } else if (!item.render) {
                 item['render'] = (text, record, index) => this._renderText(item, data, index, item.dataIndex, text)
             }
         })
@@ -154,7 +158,7 @@ class TableGrid extends React.Component {
             editable ?
                 <span key={Math.random()}>
                     <a onClick={() => this.editDone(index, 'save', btn)}>{btn.saveText ? btn.saveText : '保存'}</a>&nbsp;&nbsp;
-                    <Popconfirm title={btn.cancelMessage ? btn.cancelMessage : '取消'} onConfirm={() => this.editDone(index, 'cancel', btn)}>
+                    <Popconfirm title={btn.cancelMessage ? btn.cancelMessage : '确定取消吗'} onConfirm={() => this.editDone(index, 'cancel', btn)}>
                         <a>{btn.cancelText ? btn.cancelText : '取消'}</a>
                     </Popconfirm>
                 </span> :
@@ -239,7 +243,7 @@ class TableGrid extends React.Component {
         const editInputRef = 'TableEditInput-' + index + '-' + key
         return <TableEditInput editable={editable} bindValidate={(callback) => { this.editInputValidates[editInputRef] = callback }}
           independent={columnsEditable.independent} value={text} dataIndex={index} dataKey={key} restorePrevValue={this.state.editable[index][key].restorePrevValue}
-          onChange={value => columnsEditable.onChange(key, index, value)} rules={columnsEditable.rules || []} />
+          onChange={value => columnsEditable.onChange(key, index, value)} onBlur={input => columnsEditable.onBlur && columnsEditable.onBlur(key, index, input)} rules={columnsEditable.rules || []} />
     }
     _renderInputSearch(columnsEditable, data, index, key, text) {
         const { editable } = this.state.editable[index][key]
@@ -258,8 +262,11 @@ class TableGrid extends React.Component {
         if (typeof editable === 'undefined') {
             return text
         }
+        const editSelectRef = 'TableEditSelect-' + index + '-' + key
         return (
-            <TableEditSelect editable={editable} options={columnsEditable.option} independent={columnsEditable.independent} value={text} onChange={value => columnsEditable.onChange(key, index, value)} />
+            <TableEditSelect editable={editable} option={columnsEditable.option} independent={columnsEditable.independent}
+              bindValidate={callback => { this.editInputValidates[editSelectRef] = callback }} rules={columnsEditable.rules || []}
+              value={eval('data[index].' + columnsEditable.option.selected)} onChange={value => columnsEditable.onChange(key, index, value)} />
         )
     }
     render() {
@@ -269,10 +276,10 @@ class TableGrid extends React.Component {
         const { data } = this.state
         // 处理CheckBox选择
         const _rowSelection = {
-            onChange: (selectedRows, record) => {
-                this.setState({ rowSelectCount:selectedRows.length, selectedRowKeys:selectedRows })
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.setState({ rowSelectCount:selectedRowKeys.length, selectedRowKeys:selectedRowKeys })
                 if (this.props.rowSelection && this.props.rowSelection.onChange instanceof Function) {
-                    this.props.rowSelection.onChange(record, selectedRows)
+                    this.props.rowSelection.onChange(selectedRowKeys, selectedRows)
                 }
             }
         }
@@ -286,10 +293,11 @@ class TableGrid extends React.Component {
                 <div>
                     {
                         rowSelection &&
-                            <div className="table-row-selection">
-                                <Icon type="info-circle" style={{ color:'#108ee9' }} />&nbsp;
-                                已选择 {rowSelection && rowSelection.selectedRowKeys ? rowSelection.selectedRowKeys.length : this.state.rowSelectCount} 项数据。
-                            </div>
+                        <div className="table-row-selection">
+                            <Icon type="info-circle" style={{ color:'#108ee9' }} />&nbsp;
+                            已选择 {rowSelection && rowSelection.selectedRowKeys ? rowSelection.selectedRowKeys.length : this.state.rowSelectCount} 项数据。
+                            <a style={{ float:'right' }} onClick={this.clearSelectedAll}>清除 <Icon type="close" /></a>
+                        </div>
                     }
                     <Table className="table-grid" ref="Tableqq" pagination={pagination || false} expandedRowKeys={eEowKeys} onExpand={this._onExpand}
                       expandedRowRender={this.props.expandedRowRender} scroll={this.props.scroll} rowSelection={rowSelection && gridRowSelection} dataSource={data} columns={_columns} />
@@ -299,6 +307,17 @@ class TableGrid extends React.Component {
             return <div>请稍后...</div>
         }
     }
+    clearSelectedAll = () => {
+        const { rowSelection } = this.props
+        if (rowSelection.onChange) {
+            rowSelection.onChange([], null)
+        } else if (rowSelection.onSelect) {
+            rowSelection.onSelect({}, false, [])
+        } else if (rowSelection.onSelectAll) {
+            rowSelection.onSelectAll(false, [], [])
+        }
+        this.setState({ rowSelectCount:0, selectedRowKeys:[] })
+    }
     _onExpand = (expanded, record) => {
         if (!this.props.expandedRowKeys) {
             this.isOnExpand = true
@@ -307,4 +326,3 @@ class TableGrid extends React.Component {
         }
     }
 }
-export default TableGrid

@@ -1,27 +1,34 @@
 import { CALL_API } from '../../../../middleware/api'
 import { CommonAction } from '../../../../constants/ActionTypes'
 
-const CLEAR_CLASSIFYS = 'CLEAR_CLASSIFYS'
-const RECEIVE_CLASSIFY_LIST = 'RECEIVE_CLASSIFY_LIST'
+const CLEAR_COMMENTS = 'CLEAR_COMMENTS'
+const RECEIVE_COMMENT_LIST = 'RECEIVE_COMMENT_LIST'
 import { BookApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
-        type: CLEAR_CLASSIFYS
+        type: CLEAR_COMMENTS
     }
 }
-export function getClassifyList(query) {
+export function getCommentList(query) {
     return {
         /* [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_AUTHORITY_LIST, CommonAction.REQUEST_FAILURE + 'CLEAR_CLASSIFYS' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_COMMENT_LIST, CommonAction.REQUEST_FAILURE + 'COMMENT' ],
             endpoint: BookApi.getList,
             options: { body: query, method:'GET' }
         } */
-        type: 'RECEIVE_CLASSIFY_LIST',
+        type: 'RECEIVE_COMMENT_LIST',
         response: {
             data: [{
                 id:1,
                 name:1,
+                parent:{
+                    id:1,
+                    name:'lxj'
+                },
+                status:'ENABLE',
+                isNav:'ENABLE',
+                sort:23,
                 createdAt:12222222222222
             }]
         }
@@ -30,17 +37,17 @@ export function getClassifyList(query) {
 
 const initialState = {
     fetching:false,
-    classifyList:null,
+    commentList:null,
     error:null
 }
 const ACTION_HANDLERS = {
-    [CommonAction.REQUEST_FAILURE + 'USER']: (state, action) => {
+    [CommonAction.REQUEST_FAILURE + 'COMMENT']: (state, action) => {
         return ({ ...state, fetching: false, error: action })
     },
-    [RECEIVE_CLASSIFY_LIST] : (state, action) => {
-        return ({ ...state, fetching: false, classifyList: action.response.data, error: null })
+    [RECEIVE_COMMENT_LIST] : (state, action) => {
+        return ({ ...state, fetching: false, commentList: action.response.data, error: null })
     },
-    [CLEAR_CLASSIFYS] : () => {
+    [CLEAR_COMMENTS] : () => {
         return ({ ...initialState })
     }
 }

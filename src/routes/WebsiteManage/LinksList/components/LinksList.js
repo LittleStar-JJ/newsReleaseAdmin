@@ -1,15 +1,15 @@
 import React from 'react'
-import { Button, message, Modal } from 'antd'
+import { Tabs, Button, message, Modal } from 'antd'
 import moment from 'moment'
 import { QuotePlanStatus } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
 
-export default class AdminList extends React.Component {
+export default class LinksList extends React.Component {
     static propTypes = {
-        AdminList: React.PropTypes.object,
-        getAdminList: React.PropTypes.func,
+        LinksList: React.PropTypes.object,
+        getLinksList: React.PropTypes.func,
         clearState: React.PropTypes.func,
         updateMsg: React.PropTypes.func,
         createMsg: React.PropTypes.func
@@ -18,12 +18,11 @@ export default class AdminList extends React.Component {
         router: React.PropTypes.object.isRequired
     }
     state = {
-        admins: [],
+        links: [],
         create:{},
         update:{},
-        isClearRowKeys:false,
         modalVisible:false,
-        AdminOne:{}
+        LinksOne:{}
     }
     constructor(props) {
         super(props)
@@ -32,37 +31,41 @@ export default class AdminList extends React.Component {
         this.pageTotalElement = 0
         this.query = {}
     }
-    getAdmins = () => {
-        this.props.getAdminList({ page: this.pageNum, size: this.pageSize, ...this.query })
+    getLinks = () => {
+        this.props.getLinksList({ page: this.pageNum, size: this.pageSize, ...this.query })
     }
     handleSearch = (value) => {
-        let _data1 = []
-        if (value.createdAt) {
-            value.createdTime.forEach((data) => {
-                _data1.push(data.format('x'))
-            })
-            value.createdTime = _data1.join('-')
-        }
         this.pageNum = 1
         this.query = value
-        this.getAdmins()
+        this.getLinks()
+    }
+    getGridOperationState = (s) => {
+        let gridOperationState = []
+        Object.keys(WorkOrderStatus).forEach((key) => {
+            if (key === s) {
+                gridOperationState.push({ [key]:{ show: true } })
+            } else {
+                gridOperationState.push({ [key]:{ show: false } })
+            }
+        })
+        return gridOperationState
     }
     componentWillMount() {
-        this.getAdmins()
+        // this.getLinks()
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.AdminList.admins) {
-            this.pageTotalElement = nextProps.AdminList.admins.totalElement
-            const admins = nextProps.AdminList.admins
-            admins.map((item) => {
-                item.createdTime = moment(item.createdTime).format('YYYY-MM-DD HH:mm:ss')
+        if (nextProps.LinksList.links) {
+            this.pageTotalElement = nextProps.LinksList.links.totalElement
+            const links = nextProps.LinksList.links.content
+            links.map((item) => {
+                item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
                 item.statusName = WorkOrderStatus[item.status]
             })
-            this.setState({ admins: admins, isClearRowKeys:false })
+            this.setState({ links: links })
             this.props.clearState()
         }
-        if (nextProps.AdminList.error) {
-            message.error(nextProps.AdminList.error.error)
+        if (nextProps.LinksList.error) {
+            message.error(nextProps.LinksList.error.error)
             this.props.clearState()
         }
     }
@@ -72,35 +75,24 @@ export default class AdminList extends React.Component {
         })
     }
     render() {
-        const admins = this.state.admins || []
-        const AdminOne = this.state.AdminOne || {}
+        // const links = this.state.links || []
+        const links = [
+            {
+                name:1,
+                url:2,
+                sort:2,
+                createdAt:11111111,
+                statusName:'启用'
+            }
+        ]
+        const LinksOne = this.state.LinksOne || {}
         const queryOptions = [
             {
                 type:'text',
-                fieldLabel:'用户名',
-                fieldName:'adminName',
+                fieldLabel:'链接名称',
+                fieldName:'name',
                 initialValue:'',
                 onChange:() => {}
-            },
-            {
-                type:'text',
-                fieldLabel:'邮箱',
-                fieldName:'email',
-                initialValue:'',
-                onChange:() => {}
-            },
-            {
-                type:'select',
-                option:{
-                    valueField:'id',
-                    textField:'name',
-                    placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
-                    // selected:plan.departureHarbor ? plan.departureHarbor.id : '',
-                    onChange:(val) => {}
-                },
-                fieldLabel:'权限',
-                fieldName:'auth'
             },
             {
                 type:'select',
@@ -113,39 +105,28 @@ export default class AdminList extends React.Component {
                 },
                 fieldLabel:'状态',
                 fieldName:'status'
-            },
-            {
-                type:'rangePicker',
-                initialValue:[],
-                onChange:(val) => { console.log(val) },
-                fieldLabel:'创建时间',
-                fieldName:'createdAt'
             }
         ]
         const gridColumns = [
             {
-                title: '用户名', // 标题
-                dataIndex: 'adminName' // 字段名称
+                title: '链接名称', // 标题
+                dataIndex: 'name' // 字段名称
             },
             {
-                title: '邮箱', // 标题
-                dataIndex: 'email' // 字段名称
+                title: '链接地址', // 标题
+                dataIndex: 'url' // 字段名称
             },
             {
-                title: '权限', // 标题
-                dataIndex: 'auth.name' // 字段名称
+                title: '序号', // 标题
+                dataIndex: 'sort' // 字段名称
+            },
+            {
+                title: '状态', // 标题
+                dataIndex: 'statusName' // 字段名称
             },
             {
                 title: '创建时间', // 标题
                 dataIndex: 'createdAt' // 字段名称
-            },
-            {
-                title: '登录时间', // 标题
-                dataIndex: 'loginTime' // 字段名称
-            },
-            {
-                title: '状态', // 标题
-                dataIndex: 'status' // 字段名称
             },
             {
                 title: '操作',
@@ -160,7 +141,7 @@ export default class AdminList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => {
-                            this.setState({ modalVisible:true, AdminOne: admins[index] })
+                            this.setState({ modalVisible:true, LinksOne: links[index] })
                         }
                     }
                 ]
@@ -169,37 +150,17 @@ export default class AdminList extends React.Component {
         const modalOption = [
             {
                 type:'text',
-                fieldLabel:'用户名',
-                fieldName:'adminName',
-                initialValue:AdminOne.adminName,
+                fieldLabel:'链接名称',
+                fieldName:'name',
+                initialValue:LinksOne.name,
                 onChange:() => {}
             },
             {
                 type:'text',
-                fieldLabel:'邮箱',
-                fieldName:'email',
-                initialValue:AdminOne.email,
+                fieldLabel:'链接地址',
+                fieldName:'url',
+                initialValue:LinksOne.url,
                 onChange:() => {}
-            },
-            {
-                type:'text',
-                fieldLabel:'密码',
-                fieldName:'password',
-                initialValue:AdminOne.password,
-                onChange:() => {}
-            },
-            {
-                type:'selectSearch',
-                option:{
-                    valueField:'id',
-                    textField:'name',
-                    placeholder:'权限',
-                    options:this.translateStatus(QuotePlanStatus),
-                    selected:(AdminOne.auth ? AdminOne.auth : {}).id,
-                    onChange:(val) => {}
-                },
-                fieldLabel:'权限',
-                fieldName:'auth'
             },
             {
                 type:'selectSearch',
@@ -208,7 +169,7 @@ export default class AdminList extends React.Component {
                     textField:'name',
                     placeholder:'选择状态',
                     options:this.translateStatus(QuotePlanStatus),
-                    selected:AdminOne.status,
+                    selected:LinksOne.status,
                     onChange:(val) => {}
                 },
                 fieldLabel:'状态',
@@ -222,11 +183,11 @@ export default class AdminList extends React.Component {
             onShowSizeChange: (current, pageSize) => {
                 this.pageSize = pageSize
                 this.pageNum = current
-                this.getAdmins()
+                this.getLinks()
             },
             onChange: (current) => {
                 this.pageNum = current
-                this.getAdmins()
+                this.getLinks()
             }
         }
         return (
@@ -238,8 +199,7 @@ export default class AdminList extends React.Component {
                     </div>
                 </div>
                 <div className="page-tabs-table">
-                    <TableGrid columns={gridColumns} dataSource={admins}
-                      pagination={pagination} isClearRowKeys={this.state.isClearRowKeys} />
+                    <TableGrid columns={gridColumns} dataSource={links} pagination={pagination} />
                 </div>
                 <Modal title="账号编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
                   footer={[<Button key="back" type="ghost" size="large" onClick={() => this.save(e)}>确认</Button>]} >

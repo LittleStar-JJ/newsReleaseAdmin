@@ -123,6 +123,11 @@ const lMeuns = {
                             name: '友情链接编辑'
                         }
                     ]
+                },
+                {
+                    router: '/siteConfig',
+                    name: '站点配置',
+                    items:[]
                 }
             ]
         }

@@ -1,15 +1,15 @@
 import { connect } from 'react-redux'
-import { clearState, getAuthorityList } from '../modules/classifyList'
+import { clearState, getClassifyList } from '../modules/classifyList'
 
-import AuthorityList from '../components/ClassifyList'
+import ClassifyList from '../components/ClassifyList'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
-    getAuthorityList: (query) => getAuthorityList(query)
+    getClassifyList: (query) => getClassifyList(query)
 }
 
 const mapStateToProps = (state) => ({
-    AuthorityList : state.AuthorityList
+    ClassifyList : state.ClassifyList
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(AuthorityList)
+export default connect(mapStateToProps, mapDispatchToProps)(ClassifyList)

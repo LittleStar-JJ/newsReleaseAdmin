@@ -7,15 +7,15 @@ import QueryList from '../../../../components/QueryList'
 
 export default class ClassifyList extends React.Component {
     static propTypes = {
-        ClassifyList: React.PropTypes.object,
-        getClassifyList: React.PropTypes.func,
+        CommentList: React.PropTypes.object,
+        getCommentList: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
     }
     state = {
-        classifyList: [],
+        commentList: [],
         isClearRowKeys:false
     }
     constructor(props) {
@@ -25,40 +25,37 @@ export default class ClassifyList extends React.Component {
         this.pageTotalElement = 0
         this.query = {}
     }
-    getClassifys = () => {
-        this.props.getClassifyList({ page: this.pageNum, size: this.pageSize, ...this.query })
+    getComments = () => {
+        this.props.getCommentList({ page: this.pageNum, size: this.pageSize, ...this.query })
     }
     handleSearch = (value) => {
+        let _datas1 = []
+        if (value.createdAt) {
+            value.createdTime.forEach((data) => {
+                _datas1.push(data.format('x'))
+            })
+            value.createdTime = _datas1.join('-')
+        }
         this.pageNum = 1
         this.query = value
-        this.getClassifys()
-    }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
+        this.getComments()
     }
     componentWillMount() {
-        this.getClassifys()
+        this.getComments()
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.ClassifyList.classifyList) {
-            this.pageTotalElement = nextProps.ClassifyList.classifyList.totalElement
-            const classifyList = nextProps.ClassifyList.classifyList
-            classifyList.map((item) => {
+        if (nextProps.CommentList.commentList) {
+            this.pageTotalElement = nextProps.CommentList.commentList.totalElement
+            const commentList = nextProps.CommentList.commentList
+            commentList.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                item.statusName = QuotePlanStatus[item.status]
             })
-            this.setState({ classifyList: classifyList })
+            this.setState({ commentList: commentList })
             this.props.clearState()
         }
-        if (nextProps.ClassifyList.error) {
-            message.error(nextProps.ClassifyList.error.error)
+        if (nextProps.CommentList.error) {
+            message.error(nextProps.CommentList.error.error)
             this.props.clearState()
         }
     }
@@ -70,7 +67,7 @@ export default class ClassifyList extends React.Component {
         return newStatus
     }
     render() {
-        const classifyList = this.state.classifyList || []
+        const commentList = this.state.commentList || []
         const queryOptions = [
             {
                 type:'text',
@@ -91,6 +88,25 @@ export default class ClassifyList extends React.Component {
                 },
                 fieldLabel:'状态',
                 fieldName:'stauts'
+            },
+            {
+                type:'select',
+                option:{
+                    valueField:'id',
+                    textField:'name',
+                    placeholder:'请选择',
+                    options:this.translateStatus(QuotePlanStatus),
+                    onChange:(val) => {}
+                },
+                fieldLabel:'状态',
+                fieldName:'status'
+            },
+            {
+                type:'rangePicker',
+                initialValue:[],
+                onChange:(val) => { console.log(val) },
+                fieldLabel:'创建时间',
+                fieldName:'createdAt'
             }
         ]
         const gridColumns = [
@@ -104,7 +120,7 @@ export default class ClassifyList extends React.Component {
             },
             {
                 title: '状态', // 标题
-                dataIndex: 'stauts' // 字段名称
+                dataIndex: 'statusName' // 字段名称
             },
             {
                 title: '导航标记', // 标题
@@ -126,7 +142,7 @@ export default class ClassifyList extends React.Component {
                             field:'status',
                             actions: []
                         },
-                        onClick:(index) => { this.context.router.push('/classifyEdit/' + classifyList[index].id) }
+                        onClick:(index) => { this.context.router.push('/commentEdit/' + commentList[index].id) }
                     }
                 ]
             }
@@ -138,11 +154,11 @@ export default class ClassifyList extends React.Component {
             onShowSizeChange: (current, pageSize) => {
                 this.pageSize = pageSize
                 this.pageNum = current
-                this.getClassifys()
+                this.getComments()
             },
             onChange: (current) => {
                 this.pageNum = current
-                this.getClassifys()
+                this.getComments()
             }
         }
         return (
@@ -154,7 +170,7 @@ export default class ClassifyList extends React.Component {
                     </div>
                 </div>
                 <div className="page-tabs-table">
-                    <TableGrid columns={gridColumns} dataSource={classifyList} pagination={pagination} />
+                    <TableGrid columns={gridColumns} dataSource={commentList} pagination={pagination} />
                 </div>
             </div>
         )

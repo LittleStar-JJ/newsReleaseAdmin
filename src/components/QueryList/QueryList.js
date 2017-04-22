@@ -582,18 +582,6 @@ class QueryForm extends React.Component {
                 })(
                     <CheckboxGroup options={options} disabled={item.disabled} size="large" style={item.option.style} onChange={(val) => this.handleSelectChange(item.option, val)} />
                 )
-            // 文件上传
-            /* case 'file':
-                return getFieldDecorator(item.fieldName, {
-                    initialValue:item.initialValue,
-                    ...rules
-                })(
-                    <Upload name="logo" action="/upload.do" listType="picture">
-                        <Button>
-                            <Icon type="upload" /> Click to upload
-                        </Button>
-                    </Upload>
-                ) */
             // 其他默认为普通input
             default:
                 return getFieldDecorator(item.fieldName, {
