@@ -33,17 +33,6 @@ export default class ClassifyList extends React.Component {
         this.query = value
         this.getClassifys()
     }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
-    }
     componentWillMount() {
         this.getClassifys()
     }
@@ -52,7 +41,7 @@ export default class ClassifyList extends React.Component {
             this.pageTotalElement = nextProps.ClassifyList.classifyList.totalElement
             const classifyList = nextProps.ClassifyList.classifyList
             classifyList.map((item) => {
-                item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                item.statusName = QuotePlanStatus[item.status]
             })
             this.setState({ classifyList: classifyList })
             this.props.clearState()
@@ -148,7 +137,7 @@ export default class ClassifyList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/authorityEdit')}>添加权限</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/authorityEdit')}>添加分类</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

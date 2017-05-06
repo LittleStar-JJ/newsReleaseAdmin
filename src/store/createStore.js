@@ -8,10 +8,10 @@ import makeRootReducer from './reducers'
 import { browserHistory } from 'react-router'
 import { updateLocation } from './location'
 import DevTools from '../containers/DevTools'
-// import api from '../middleware/api'
+import api from '../middleware/api'
 
 export default (initialState = {}) => {
-    const middleware = [thunk]
+    const middleware = [thunk, api]
     const enhancers = []
     if (__DEV__) {
         middleware.push(createLogger())

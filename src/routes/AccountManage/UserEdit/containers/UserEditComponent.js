@@ -10,7 +10,7 @@ const mapDispatchToProps = {
 }
 
 const mapStateToProps = (state) => ({
-    UesrEdit : state.UesrEdit
+    UesrEdit : state.UserEdit
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserEdit)

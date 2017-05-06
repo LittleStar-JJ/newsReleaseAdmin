@@ -6,7 +6,7 @@ import { Icon, Dropdown, Menu } from 'antd'
 import LeftMenu from '../../components/LeftMenu'
 import Breadcrumb from '../../components/Breadcrumb'
 import BaseLayout from '../Base/BaseLayout'
-// import Auth from '../../utils/Auth'
+import Auth from '../../utils/Auth'
 import './CoreLayout.scss'
 import '../../styles/main.scss'
 
@@ -134,6 +134,10 @@ const lMeuns = {
     ]
 }
 export class CoreLayout extends BaseLayout {
+    loginOut = () => {
+        Auth.loginOut()
+        Auth.dispatchAuthExpiredAction()
+    }
     render() {
         let meuns = lMeuns
         const DropdownMenu = (

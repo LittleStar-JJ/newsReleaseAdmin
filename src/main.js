@@ -3,7 +3,7 @@
  */
 import React from 'react'
 import { browserHistory } from 'react-router'
-// import auth from './utils/Auth'
+import auth from './utils/Auth'
 import ReactDOM from 'react-dom'
 import createStore from './store/createStore'
 import AppContainer from './containers/AppContainer'
@@ -21,6 +21,15 @@ let render = () => {
         MOUNT_NODE
     )
 }
+// 授权过期监听
+auth.addAuthExpiredListener((data) => {
+    console.log('AuthExpiredListener=======================', data)
+    let url = '/login'
+    if (data && data.url) {
+        url = data.url
+    }
+    browserHistory.replace(url)
+})
 // 启用devTools工具
 if (__DEV__) {
     if (window.devToolsExtension) {

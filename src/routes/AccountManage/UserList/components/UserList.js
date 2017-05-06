@@ -14,8 +14,7 @@ export default class UserList extends React.Component {
         router: React.PropTypes.object.isRequired
     }
     state = {
-        users: [],
-        isClearRowKeys:false
+        users: []
     }
     constructor(props) {
         super(props)
@@ -35,27 +34,10 @@ export default class UserList extends React.Component {
             })
             value.createdAt = _datas1.join('-')
         }
-        let _datas2 = []
-        if (value.loginTime) {
-            value.loginTime.forEach((data) => {
-                _datas2.push(data.format('x'))
-            })
-            value.loginTime = _datas2.join('-')
-        }
         this.pageNum = 1
         this.query = value
+        console.log('xxxxxx', this.query)
         this.getUsers()
-    }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
     }
     componentWillMount() {
         this.getUsers()
@@ -63,13 +45,13 @@ export default class UserList extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.UserList.users) {
             this.pageTotalElement = nextProps.UserList.users.totalElement
-            const users = nextProps.UserList.users
+            const users = nextProps.UserList.users.content
             users.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
                 item.loginTime = moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')
                 item.statusName = QuotePlanStatus[item.status]
             })
-            this.setState({ users: users, isClearRowKeys:false })
+            this.setState({ users: users })
             this.props.clearState()
         }
         if (nextProps.UserList.error) {
@@ -194,7 +176,7 @@ export default class UserList extends React.Component {
                 </div>
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={users}
-                      pagination={pagination} isClearRowKeys={this.state.isClearRowKeys} />
+                      pagination={pagination} />
                 </div>
             </div>
         )

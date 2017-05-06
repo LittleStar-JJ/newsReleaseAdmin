@@ -2,10 +2,10 @@
  * Created by xwatson on 2016/12/8.
  */
 import CoreLayout from '../layouts/CoreLayout'
-// import AuthLayout from '../layouts/AuthLayout'
+import AuthLayout from '../layouts/AuthLayout'
 import Home from './Home'
 import NotFound from './NotFound'
-// import Login from './Login'
+import Login from './Login'
 import AdminList from './AccountManage/AdminList'
 import UserList from './AccountManage/UserList'
 import UserEdit from './AccountManage/UserEdit'
@@ -41,6 +41,11 @@ export const createRoutes = (store) => ([
             CommentEdit(store)
 
         ]
+    },
+    {
+        path: '/login',
+        component: AuthLayout,
+        indexRoute: Login(store)
     },
     {
         path: '*',

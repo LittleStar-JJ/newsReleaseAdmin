@@ -22,7 +22,6 @@ export default class OBOREdit extends React.Component {
         this.refs.QueryList.refs.wrappedComponent.refs.formWrappedComponent.handleSearch(e, callback)
     }
     render() {
-        console.log('啊啊啊', this.props.edit)
         return (
             <QueryList style={this.props.style} queryOptions={this.props.options} colSpan={this.props.colSpan} showSearch={false} ref="QueryList"
               edit={this.props.edit} />

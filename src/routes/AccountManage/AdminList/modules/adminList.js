@@ -20,29 +20,35 @@ export function getAdminList(query) {
             options: { body: query, method:'GET' }
         } */
         type: 'RECEIVE_ADMIN_LIST',
-        response: {
-            data: [{
-                adminName:1,
-                email:2,
-                auth: {
-                    id: 'ENABLE',
-                    name:'启用'
-                },
-                createdAt:'s',
-                loginTime:'d',
-                status:'启用'
-            }]
+        response:{
+            code:0,
+            data:{
+                totalElement: 1,
+                content: [
+                    {
+                        adminName:1,
+                        email:1,
+                        auth: {
+                            name:'启用',
+                            id:'ENABLE'
+                        },
+                        createdAt:'11111111',
+                        loginTime:'11111111',
+                        status:'ENABLE'
+                    }
+                ]
+            }
         }
     }
 }
 export function createMsg(query) {
     return {
         /* [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
             endpoint: BookApi.getList,
             options: { body: query, method:'GET' }
         } */
-        type: 'RECEIVE_UPDATE_ADMIN',
+        type: 'RECEIVE_CREATE_ADMIN',
         response: {
             code: 0,
             mag: ''
@@ -52,11 +58,11 @@ export function createMsg(query) {
 export function updateMsg(query) {
     return {
         /* [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
             endpoint: BookApi.getList,
             options: { body: query, method:'GET' }
         } */
-        type: 'RECEIVE_CREATE_ADMIN',
+        type: 'RECEIVE_UPDATE_ADMIN',
         response: {
             code: 0,
             mag: ''

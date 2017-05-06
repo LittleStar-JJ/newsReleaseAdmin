@@ -74,7 +74,7 @@ export default class AuthorityList extends React.Component {
         ]
         const gridColumns = [
             {
-                title: '用户名', // 标题
+                title: '权限名称', // 标题
                 dataIndex: 'name' // 字段名称
             },
             {

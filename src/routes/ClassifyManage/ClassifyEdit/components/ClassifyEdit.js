@@ -1,6 +1,6 @@
 import React from 'react'
 import moment from 'moment'
-import { Button, Popconfirm, message, Form, Row, Col } from 'antd'
+import { Button, Popconfirm, message, Form, Tree } from 'antd'
 import OBOREdit from '../../../../components/OBOREdit'
 import { QuotePlanStatus, genderStatus } from '../../../../constants/Status'
 
@@ -22,6 +22,7 @@ class ClassifyEdit extends React.Component {
         super(props)
         const { params: { id } } = props
         this.id = id
+        this.status = 'DISABLED'
     }
     state = {
         classifyDetail: {},
@@ -117,8 +118,10 @@ class ClassifyEdit extends React.Component {
                 option:{
                     checked:'启用', // 启用显示文本
                     unChecked:'禁用', // 关闭显示文本
-                    initialValue: classifyDetail.status || false, // 默认值（true/false）
-                    onChange:(val) => {}
+                    initialValue: classifyDetail.status ? classifyDetail.status === 'ENABLE' : true,
+                    onChange:(val) => {
+                        this.status = val ? 'ENABLE' : 'DISABLED'
+                    }
                 }
             },
             {

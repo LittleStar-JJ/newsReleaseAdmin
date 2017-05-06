@@ -22,6 +22,7 @@ export default class LinksList extends React.Component {
         create:{},
         update:{},
         modalVisible:false,
+        newRandomKeys:Math.random(),
         LinksOne:{}
     }
     constructor(props) {
@@ -38,17 +39,6 @@ export default class LinksList extends React.Component {
         this.pageNum = 1
         this.query = value
         this.getLinks()
-    }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
     }
     componentWillMount() {
         // this.getLinks()
@@ -141,7 +131,7 @@ export default class LinksList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => {
-                            this.setState({ modalVisible:true, LinksOne: links[index] })
+                            this.setState({ modalVisible:true, LinksOne: links[index], newRandomKeys:Math.random() })
                         }
                     }
                 ]
@@ -174,6 +164,60 @@ export default class LinksList extends React.Component {
                 },
                 fieldLabel:'状态',
                 fieldName:'status'
+            },
+            {
+                type:'file',
+                fieldLabel:'图标',
+                uploadProps:{
+                    name: 'file',
+                    multiple:true,
+                    accept:'.jpg,.jpeg,.gif,.png,.bmp',
+                    action: '',
+                    data:{ authToken:this.authToken },
+                    fileList:this.state.fileList,
+                    listType:'picture',
+                    onRemove:(file) => {
+                        this.state.fileList.map((item, i) => {
+                            if (item.uid === file.uid) {
+                                this.state.fileList.splice(i, 1)
+                            }
+                        })
+                        this.setState({ fileList:this.state.fileList })
+                        return true
+                    },
+                    onChange: (info) => {
+                        if (info.file.status === 'done') {
+                            if (info.file.response.code === ResponseCode.SUCCESS) {
+                                const fileData = info.file.response.data
+                                let _otherFiles = []
+                                this.state.fileList.forEach((item, i) => {
+                                    if (item.name !== info.file.name) {
+                                        _otherFiles.push(item)
+                                    }
+                                })
+                                _otherFiles.push({
+                                    uid: fileData.id,
+                                    name: info.file.name,
+                                    status: 'done',
+                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
+                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
+                                })
+                                message.success(`${info.file.name} 上传成功`)
+                                this.setState({ fileList:_otherFiles })
+                                return false
+                            } else {
+                                if (info.file.response.code === ResponseCode.AUTH_EXPIRED) this.context.router.replace('/login')
+                                message.error(info.file.response.message)
+                            }
+                        } else if (info.file.status === 'error') {
+                            message.error(`${info.file.name} 上传失败.`)
+                        }
+                        this.state.fileList.push(info.file)
+                        this.setState({ fileList:this.state.fileList })
+                    }
+                },
+                fieldName:'file',
+                onChange:() => {}
             }
         ]
         const pagination = {
@@ -193,7 +237,7 @@ export default class LinksList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true }) }}>账号创建</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true, newRandomKeys:Math.random() }) }}>友情链接创建</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
@@ -201,8 +245,8 @@ export default class LinksList extends React.Component {
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={links} pagination={pagination} />
                 </div>
-                <Modal title="账号编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
-                  footer={[<Button key="back" type="ghost" size="large" onClick={() => this.save(e)}>确认</Button>]} >
+                <Modal key={this.state.newRandomKeys} title="友情链接编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
+                  footer={[<Button key="back" type="ghost" size="large" onClick={(e) => this.save(e)}>确认</Button>]} >
                     <OBOREdit ref="OBOREdit1" colSpan={24} options={modalOption} />
                 </Modal>
             </div>
@@ -216,6 +260,7 @@ export default class LinksList extends React.Component {
             } else {
                 this.props.createMsg({ admin: JSON.stringify(value1) })
             }
+            this.setState({ modalVisible:false })
         })
     }
 }

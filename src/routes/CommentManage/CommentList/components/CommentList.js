@@ -36,6 +36,8 @@ export default class ClassifyList extends React.Component {
             })
             value.createdTime = _datas1.join('-')
         }
+        value['user.name'] = value.user.name
+        delete value.user
         this.pageNum = 1
         this.query = value
         this.getComments()
@@ -71,23 +73,17 @@ export default class ClassifyList extends React.Component {
         const queryOptions = [
             {
                 type:'text',
-                fieldLabel:'分类名称',
-                fieldName:'name',
+                fieldLabel:'用户名',
+                fieldName:'user.name',
                 initialValue:'',
                 onChange:() => {}
             },
             {
-                type:'select',
-                option:{
-                    valueField:'id',
-                    textField:'name',
-                    placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
-                    // selected:plan.departureHarbor ? plan.departureHarbor.id : '',
-                    onChange:(val) => {}
-                },
-                fieldLabel:'状态',
-                fieldName:'stauts'
+                type:'text',
+                fieldLabel:'新闻标题',
+                fieldName:'title',
+                initialValue:'',
+                onChange:() => {}
             },
             {
                 type:'select',
@@ -105,30 +101,30 @@ export default class ClassifyList extends React.Component {
                 type:'rangePicker',
                 initialValue:[],
                 onChange:(val) => { console.log(val) },
-                fieldLabel:'创建时间',
+                fieldLabel:'评论时间',
                 fieldName:'createdAt'
             }
         ]
         const gridColumns = [
             {
-                title: '分类名称', // 标题
-                dataIndex: 'name' // 字段名称
+                title: '用户名', // 标题
+                dataIndex: 'user.name' // 字段名称
             },
             {
-                title: '上级分类', // 标题
-                dataIndex: 'parent.name' // 字段名称
+                title: '内容', // 标题
+                dataIndex: 'content' // 字段名称
+            },
+            {
+                title: '新闻标题', // 标题
+                dataIndex: 'news.title' // 字段名称
             },
             {
                 title: '状态', // 标题
                 dataIndex: 'statusName' // 字段名称
             },
             {
-                title: '导航标记', // 标题
-                dataIndex: 'isNav' // 字段名称
-            },
-            {
-                title: '序号', // 标题
-                dataIndex: 'sort' // 字段名称
+                title: '评论时间', // 标题
+                dataIndex: 'createdAt' // 字段名称
             },
             {
                 title: '操作',
@@ -137,7 +133,7 @@ export default class ClassifyList extends React.Component {
                 btns:[
                     {
                         type:'link',
-                        text:'编辑',
+                        text:'查看',
                         status:{
                             field:'status',
                             actions: []

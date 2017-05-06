@@ -5,7 +5,7 @@ const CLEAR_NEWS_EDIT = 'CLEAR_NEWS_EDIT'
 const RECEIVE_NEWS_EDIT = 'RECEIVE_NEWS_EDIT'
 const RECEIVE_CREATE_NEWS = 'RECEIVE_CREATE_NEWS'
 const RECEIVE_UPDATE_NEWS = 'RECEIVE_UPDATE_NEWS'
-import { BookApi } from '../../../../constants/Api'
+import { NewsApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
@@ -16,7 +16,7 @@ export function getNewsById(id) {
     return {
         [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_NEWS_EDIT, CommonAction.REQUEST_FAILURE + 'NEWSEDIT' ],
-            endpoint: BookApi.getUesrById(id),
+            endpoint: NewsApi.getNewsById(id),
             options: { method:'GET' }
         }
     }
@@ -25,7 +25,7 @@ export function createNews(p) {
     return {
         [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_NEWS, CommonAction.REQUEST_FAILURE + 'NEWSEDIT' ],
-            endpoint: BookApi.createUser,
+            endpoint: NewsApi.createNews,
             options: { body:p, method:'POST' }
         }
     }
@@ -34,7 +34,7 @@ export function updateNews(p) {
     return {
         [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_NEWS, CommonAction.REQUEST_FAILURE + 'NEWSEDIT' ],
-            endpoint: BookApi.updateUser,
+            endpoint: NewsApi.updateNews,
             options: { body:p, method:'POST' }
         }
     }

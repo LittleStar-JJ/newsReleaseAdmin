@@ -88,7 +88,7 @@ class NewsEdit extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'summary',
                 placeholder:'请输入',
-                initialValue:newsDetail.path,
+                initialValue:newsDetail.summary,
                 onChange:() => {}
             },
             {
@@ -132,17 +132,6 @@ class NewsEdit extends React.Component {
                 fieldName:'status'
             },
             {
-                type:'switch',
-                fieldLabel:'是否轮播',
-                fieldName:'isCarousel',
-                option:{
-                    checked:'启用', // 启用显示文本
-                    unChecked:'禁用', // 关闭显示文本
-                    initialValue: newsDetail.isCarousel || false, // 默认值（true/false）
-                    onChange:(val) => {}
-                }
-            },
-            {
                 type:'text',
                 fieldLabel:'作者',
                 disabled:this.state.disabled,
@@ -167,6 +156,136 @@ class NewsEdit extends React.Component {
                 fieldName:'accessCount',
                 placeholder:'请输入',
                 initialValue:newsDetail.author,
+                onChange:() => {}
+            },
+            {
+                type:'textArea',
+                style:{ height:'60px' },
+                rules:[{ required:true, message:'请输入' }],
+                fieldLabel:'内容',
+                disabled:this.state.disabled,
+                fieldName:'content',
+                placeholder:'请输入',
+                initialValue:newsDetail.content,
+                onChange:() => {}
+            },
+            {
+                type:'switch',
+                fieldLabel:'是否轮播',
+                fieldName:'isCarousel',
+                option:{
+                    checked:'启用', // 启用显示文本
+                    unChecked:'禁用', // 关闭显示文本
+                    initialValue: newsDetail.isCarousel || false, // 默认值（true/false）
+                    onChange:(val) => {}
+                }
+            },
+            {
+                type:'file',
+                fieldLabel:'轮播图',
+                uploadProps:{
+                    name: 'file',
+                    multiple:true,
+                    accept:'.jpg,.jpeg,.gif,.png,.bmp',
+                    action: '',
+                    data:{ authToken:this.authToken },
+                    fileList:this.state.fileList,
+                    listType:'picture',
+                    onRemove:(file) => {
+                        this.state.fileList.map((item, i) => {
+                            if (item.uid === file.uid) {
+                                this.state.fileList.splice(i, 1)
+                            }
+                        })
+                        this.setState({ fileList:this.state.fileList })
+                        return true
+                    },
+                    onChange: (info) => {
+                        if (info.file.status === 'done') {
+                            if (info.file.response.code === ResponseCode.SUCCESS) {
+                                const fileData = info.file.response.data
+                                let _otherFiles = []
+                                this.state.fileList.forEach((item, i) => {
+                                    if (item.name !== info.file.name) {
+                                        _otherFiles.push(item)
+                                    }
+                                })
+                                _otherFiles.push({
+                                    uid: fileData.id,
+                                    name: info.file.name,
+                                    status: 'done',
+                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
+                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
+                                })
+                                message.success(`${info.file.name} 上传成功`)
+                                this.setState({ fileList:_otherFiles })
+                                return false
+                            } else {
+                                if (info.file.response.code === ResponseCode.AUTH_EXPIRED) this.context.router.replace('/login')
+                                message.error(info.file.response.message)
+                            }
+                        } else if (info.file.status === 'error') {
+                            message.error(`${info.file.name} 上传失败.`)
+                        }
+                        this.state.fileList.push(info.file)
+                        this.setState({ fileList:this.state.fileList })
+                    }
+                },
+                fieldName:'carouselPic',
+                onChange:() => {}
+            },
+            {
+                type:'file',
+                fieldLabel:'缩略图',
+                uploadProps:{
+                    name: 'file',
+                    multiple:true,
+                    accept:'.jpg,.jpeg,.gif,.png,.bmp',
+                    action: '',
+                    data:{ authToken:this.authToken },
+                    fileList:this.state.fileList,
+                    listType:'picture',
+                    onRemove:(file) => {
+                        this.state.fileList.map((item, i) => {
+                            if (item.uid === file.uid) {
+                                this.state.fileList.splice(i, 1)
+                            }
+                        })
+                        this.setState({ fileList:this.state.fileList })
+                        return true
+                    },
+                    onChange: (info) => {
+                        if (info.file.status === 'done') {
+                            if (info.file.response.code === ResponseCode.SUCCESS) {
+                                const fileData = info.file.response.data
+                                let _otherFiles = []
+                                this.state.fileList.forEach((item, i) => {
+                                    if (item.name !== info.file.name) {
+                                        _otherFiles.push(item)
+                                    }
+                                })
+                                _otherFiles.push({
+                                    uid: fileData.id,
+                                    name: info.file.name,
+                                    status: 'done',
+                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
+                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
+                                })
+                                message.success(`${info.file.name} 上传成功`)
+                                this.setState({ fileList:_otherFiles })
+                                return false
+                            } else {
+                                if (info.file.response.code === ResponseCode.AUTH_EXPIRED) this.context.router.replace('/login')
+                                message.error(info.file.response.message)
+                            }
+                        } else if (info.file.status === 'error') {
+                            message.error(`${info.file.name} 上传失败.`)
+                        }
+                        this.state.fileList.push(info.file)
+                        this.setState({ fileList:this.state.fileList })
+                    }
+                },
+                fieldName:'thumbnailPic',
                 onChange:() => {}
             }
         ]

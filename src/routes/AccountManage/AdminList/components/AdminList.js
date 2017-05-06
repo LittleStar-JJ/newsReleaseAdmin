@@ -21,7 +21,7 @@ export default class AdminList extends React.Component {
         admins: [],
         create:{},
         update:{},
-        isClearRowKeys:false,
+        newRandomKeys:Math.random(),
         modalVisible:false,
         AdminOne:{}
     }
@@ -53,12 +53,13 @@ export default class AdminList extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.AdminList.admins) {
             this.pageTotalElement = nextProps.AdminList.admins.totalElement
-            const admins = nextProps.AdminList.admins
+            const admins = nextProps.AdminList.admins.content
             admins.map((item) => {
-                item.createdTime = moment(item.createdTime).format('YYYY-MM-DD HH:mm:ss')
-                item.statusName = WorkOrderStatus[item.status]
+                item.loginTime = moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')
+                item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                item.statusName = QuotePlanStatus[item.status]
             })
-            this.setState({ admins: admins, isClearRowKeys:false })
+            this.setState({ admins: admins })
             this.props.clearState()
         }
         if (nextProps.AdminList.error) {
@@ -96,7 +97,7 @@ export default class AdminList extends React.Component {
                     textField:'name',
                     placeholder:'请选择',
                     options:this.translateStatus(QuotePlanStatus),
-                    // selected:plan.departureHarbor ? plan.departureHarbor.id : '',
+                    selected:'',
                     onChange:(val) => {}
                 },
                 fieldLabel:'权限',
@@ -145,7 +146,7 @@ export default class AdminList extends React.Component {
             },
             {
                 title: '状态', // 标题
-                dataIndex: 'status' // 字段名称
+                dataIndex: 'statusName' // 字段名称
             },
             {
                 title: '操作',
@@ -160,7 +161,7 @@ export default class AdminList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => {
-                            this.setState({ modalVisible:true, AdminOne: admins[index] })
+                            this.setState({ modalVisible:true, AdminOne: admins[index], newRandomKeys:Math.random() })
                         }
                     }
                 ]
@@ -232,17 +233,17 @@ export default class AdminList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true }) }}>账号创建</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true, newRandomKeys:Math.random(), AdminOne: {} }) }}>账号创建</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
                 </div>
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={admins}
-                      pagination={pagination} isClearRowKeys={this.state.isClearRowKeys} />
+                      pagination={pagination} />
                 </div>
-                <Modal title="账号编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
-                  footer={[<Button key="back" type="ghost" size="large" onClick={() => this.save(e)}>确认</Button>]} >
+                <Modal key={this.state.newRandomKeys} title="账号编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
+                  footer={[<Button key="back" type="primary" size="large" onClick={(e) => this.save(e)}>确认</Button>]} >
                     <OBOREdit ref="OBOREdit1" colSpan={24} options={modalOption} />
                 </Modal>
             </div>
@@ -250,9 +251,9 @@ export default class AdminList extends React.Component {
     }
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value1) => {
-            if (this.id) {
-                admin.id = this.id
-                this.props.updateMsg({ admin: JSON.stringify(value1) })
+            console.log('vvvvvvv', value1)
+            if (this.state.AdminOne) {
+                this.props.updateMsg({ id: this.state.AdminOne.id, admin: JSON.stringify(value1) })
             } else {
                 this.props.createMsg({ admin: JSON.stringify(value1) })
             }

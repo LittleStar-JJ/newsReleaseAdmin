@@ -47,7 +47,6 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'name',
                 placeholder:'请输入',
-                initialValue:classifyDetail.name,
                 onChange:() => {}
             },
             {
@@ -57,7 +56,15 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'title',
                 placeholder:'请输入',
-                initialValue:classifyDetail.path,
+                onChange:() => {}
+            },
+            {
+                type:'text',
+                rules:[{ required:true, message:'请输入' }],
+                fieldLabel:'网站关键字',
+                disabled:this.state.disabled,
+                fieldName:'keyWords',
+                placeholder:'请输入',
                 onChange:() => {}
             },
             {
@@ -68,22 +75,7 @@ class SiteConfig extends React.Component {
                     textField:'name',
                     placeholder:'请选择',
                     options:this.convertStatus(QuotePlanStatus),
-                    selected:classifyDetail.parent,
-                    onChange:(val) => {}
-                },
-                disabled:false,
-                fieldLabel:'网站关键字',
-                fieldName:'keyWords'
-            },
-            {
-                type:'select',
-                rules:[{ required:true, message:'请选择' }],
-                option:{
-                    valueField:'id',
-                    textField:'name',
-                    placeholder:'请选择',
-                    options:this.convertStatus(QuotePlanStatus),
-                    selected:classifyDetail.status,
+                    // selected:classifyDetail.status,
                     onChange:(val) => {}
                 },
                 disabled:false,
@@ -91,23 +83,11 @@ class SiteConfig extends React.Component {
                 fieldName:'status'
             },
             {
-                type:'switch',
-                fieldLabel:'是否导航',
-                fieldName:'status',
-                option:{
-                    checked:'启用', // 启用显示文本
-                    unChecked:'禁用', // 关闭显示文本
-                    initialValue: classifyDetail.status || false, // 默认值（true/false）
-                    onChange:(val) => {}
-                }
-            },
-            {
                 type:'text',
                 fieldLabel:'网站描述',
                 disabled:this.state.disabled,
                 fieldName:'description',
                 placeholder:'请输入',
-                initialValue:classifyDetail.sort,
                 onChange:() => {}
             },
             {
@@ -127,7 +107,6 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'message',
                 placeholder:'请输入',
-                initialValue:classifyDetail.sort,
                 onChange:() => {}
             }
         ]

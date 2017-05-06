@@ -184,7 +184,7 @@ export default class NewsList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/userEdit')}>新闻添加</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/newsEdit')}>新闻添加</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

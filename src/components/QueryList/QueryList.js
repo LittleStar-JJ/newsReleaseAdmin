@@ -3,7 +3,7 @@
  */
 import './QueryList.scss'
 import React from 'react'
-import { Form, Row, Col, Input, Button, Icon, Select, DatePicker, Switch, Radio, Upload, Checkbox } from 'antd'
+import { Form, Row, Col, Input, Button, Icon, Select, DatePicker, Switch, Radio, Upload, Checkbox, Popover } from 'antd'
 const InputGroup = Input.Group
 import moment from 'moment'
 const FormItem = Form.Item
@@ -29,6 +29,7 @@ class QueryForm extends React.Component {
         isClear         : false,
         expand          : false,
         switchs         : null,
+        textGroupValidate : '', // 组合框验证
         ordinaryOptions : [], // 普通搜索配置项
         advancedOptions : [] // 高级搜索配置项
     }
@@ -44,6 +45,7 @@ class QueryForm extends React.Component {
         this.searchCountry = []
         this.catchOptions = props.queryOptions
         this.customizeRules = []
+        this.rangePickeRepeat = [] // 重复的时间区间需要转换
     }
     /**
      * 点击查询按钮
@@ -56,9 +58,16 @@ class QueryForm extends React.Component {
         const { onSearchChange } = this.props
         const { setFieldsValue, getFieldsValue } = this.props.form
         if (this.customizeRules.length) {
+            const _newCustomizeRules = []
+            const _group = []
+            this.customizeRules.forEach((item, i) => {
+                if (typeof item === 'string') {
+                    _newCustomizeRules.push(item)
+                }
+            })
             // 获取自定义验证的字段值
-            const customizeFieldsValue = getFieldsValue(this.customizeRules)
-            // 重新设置值，解决已经验证过的不再调用验证函数问题
+            const customizeFieldsValue = getFieldsValue(_newCustomizeRules)
+            // 重新设置表单值，解决已经验证过的不再调用验证函数问题
             setFieldsValue(customizeFieldsValue)
         }
         this.props.form.validateFieldsAndScroll((err, values) => {
@@ -76,12 +85,25 @@ class QueryForm extends React.Component {
                 let _v = this.refs[s].handleValidator()
                 values[s.replace(INPUTSEARCHREF, '')] = _v
             })
+            // 验证组合输入框
+            if (this.state.textGroupValidate !== '') return false
             if (!isCascade) return false
             if (!err) {
                 // 绑定国家搜索字段
                 this.searchCountry.forEach((s) => {
                     let _v = this.refs[s].refs.wrappedInstance.handleValidator()
                     values[s] = _v
+                })
+                const rangePickeRepeatValue = getFieldsValue(this.rangePickeRepeat)
+                Object.keys(rangePickeRepeatValue).forEach((key) => {
+                    const _datas = rangePickeRepeatValue[key]
+                    if (_datas && _datas.length) {
+                        if (_datas[0].format('x') === _datas[1].format('x')) {
+                            _datas[0].set({ hour:0, minute:0, second:0, millisecond:0 })
+                            // _datas[1].add(1, 'days')
+                            _datas[1].set({ hour:23, minute:59, second:59, millisecond:0 })
+                        }
+                    }
                 })
                 /* this.inputSearchFields.forEach((item) => {
                     values[item] = this.state[item + '_inputSearchValue']
@@ -100,7 +122,7 @@ class QueryForm extends React.Component {
      */
     handleReset = () => {
         this.props.form.resetFields()
-        this.setState({ isClear:true })
+        this.setState({ isClear:true, textGroupValidate:'' })
     }
     /**
      * 展开，收起
@@ -152,13 +174,13 @@ class QueryForm extends React.Component {
      * @param value 输入框的值
      * @param callback 回调通知ant显示验证消息
      */
-    handleValidator(validates, messages, rule, value, callback) {
+    handleValidator(item, validates, messages, rule, value, callback) {
         let isValidate = false
         if (validates && value !== '') {
             let _keyVal = validates.split('=')
             switch (_keyVal[0]) {
                 case 'reg':
-                    this._regValidator(_keyVal[1], value, messages, callback)
+                    this._regValidator(item, _keyVal[1], value, messages, callback)
                     isValidate = true
                     break
             }
@@ -174,9 +196,18 @@ class QueryForm extends React.Component {
      * @param value
      * @param callback
      */
-    handleCustomize = (customize, rule, value, callback) => {
-        if (customize instanceof Function) {
-            const msg = customize(value)
+    handleCustomize = (item, customize, rule, value, callback) => {
+        if (value && value.toString().trim() !== '' && customize instanceof Function) {
+            const msg = customize(value, this.props.form)
+            if (item.type === 'textGroup') {
+                if (msg !== true) {
+                    this.setState({ textGroupValidate:msg })
+                } else {
+                    this.setState({ textGroupValidate:'' })
+                }
+                callback()
+                return false
+            }
             if (msg !== true) {
                 callback(msg)
             } else {
@@ -223,8 +254,27 @@ class QueryForm extends React.Component {
      * @param callback 回调通知ant
      * @private
      */
-    _regValidator(reg, value, msg, callback) {
+    _regValidator = (item, reg, value, msg, callback) => {
         let _reg = new RegExp(reg)
+        if (item.type === 'textGroup') {
+            const { getFieldValue } = this.props.form
+            let _isValidator = true
+            item.fieldName.forEach((name) => {
+                let _value = getFieldValue(name)
+                if (_value && _value !== '') {
+                    if (!_reg.test(_value)) {
+                        _isValidator = false
+                    }
+                }
+            })
+            if (!_isValidator) {
+                this.setState({ textGroupValidate:msg })
+            } else {
+                this.setState({ textGroupValidate:'' })
+            }
+            callback()
+            return false
+        }
         if (!_reg.test(value)) {
             callback(msg)
         } else {
@@ -319,7 +369,6 @@ class QueryForm extends React.Component {
         }
         // 动态设置字段值
         if (fieldsValue && this.isFirstSetFieldsValue) {
-            console.log(fieldsValue)
             setFieldsValue(fieldsValue)
             this.isFirstSetFieldsValue = false
         }
@@ -339,7 +388,7 @@ class QueryForm extends React.Component {
         rulesClone.forEach((rule) => {
             if (rule.validate) {
                 validators.push({
-                    validator : this.handleValidator.bind(this, rule.validate, rule.message)
+                    validator : this.handleValidator.bind(this, item, rule.validate, rule.message)
                 })
             } else if (rule.customize) {
                 if (this.isInit) {
@@ -348,13 +397,13 @@ class QueryForm extends React.Component {
                     }
                 }
                 validators.push({
-                    validator : this.handleCustomize.bind(this, rule.customize)
+                    validator : this.handleCustomize.bind(this, item, rule.customize)
                 })
             } else if (rule instanceof Array) {
                 rule.forEach((r) => {
                     if (r.validate) {
                         validators.push({
-                            validator: this.handleValidator.bind(this, r.validate, r.message)
+                            validator: this.handleValidator.bind(this, item, r.validate, r.message)
                         })
                     } else {
                         validators.push(r)
@@ -449,7 +498,7 @@ class QueryForm extends React.Component {
                         initialValue: invs
                     }
                 }
-                if (!item.allowRepeat) {
+                if (typeof item.allowRepeat !== 'undefined' && !item.allowRepeat) {
                     if (!rules.rules) {
                         rules.rules = []
                     }
@@ -457,11 +506,20 @@ class QueryForm extends React.Component {
                         validator : this.handleValidatorRangePicker.bind(this)
                     })
                 }
+                let format = 'YYYY-MM-DD'
+                if (item.showTime) {
+                    format = 'YYYY-MM-DD HH:mm'
+                }
+                if (!item.showTime && (typeof item.allowRepeat === 'undefined' || item.allowRepeat) &&
+                    this.rangePickeRepeat.indexOf(item.fieldName) === -1) {
+                    this.rangePickeRepeat.push(item.fieldName)
+                }
                 return getFieldDecorator(item.fieldName, {
                     ...initia,
                     ...rules
                 })(
-                    <RangePicker style={item.style || { width:'100%' }} disabled={item.disabled} onChange={(val) => item.onChange(val)} />
+                    <RangePicker style={item.style || { width:'100%' }} showTime={item.showTime ? { format:'HH:mm' } : false} format={format}
+                      disabled={item.disabled} onChange={(val) => item.onChange(val)} />
                 )
             // 文本区
             case 'textArea':
@@ -469,16 +527,13 @@ class QueryForm extends React.Component {
                     initialValue:item.initialValue,
                     ...rules
                 })(
-                    <Input type="textarea" maxLength="255" disabled={item.disabled} style={item.style}
+                    <Input type="textarea" disabled={item.disabled} style={item.style}
                       placeholder={item.placeholder || ''} rows={item.rows ? item.rows : 4} onChange={(e) => item.onChange(e.target.value)} />
                 )
             // 一行多个文本
             case 'textGroup':
                 const _span = 24 / item.fieldName.length
-                return getFieldDecorator(item.fieldName, {
-                    initialValue:1,
-                    ...rules
-                })(
+                return (
                     <InputGroup>
                         {
                             item.fieldName.map((gps, i) => {
@@ -487,19 +542,41 @@ class QueryForm extends React.Component {
                                         rules: [validators[i]]
                                     }
                                 }
+                                if (!validators[i]) validators[i] = {}
                                 return (
-                                    <Col span={_span} key={'text-group-' + i}>
+                                    <Col span={_span} key={'text-group-' + i} className={this.state.textGroupValidate !== '' && 'has-error'}>
                                         {
                                             getFieldDecorator(gps, {
-                                                initialValue:item.initialValue ? item.initialValue[i] : '',
+                                                initialValue: item.initialValue ? item.initialValue[i] : '',
                                                 ...rules
-                                            })(
-                                                <Input placeholder={item.placeholder ? item.placeholder[i] : ''} />
+                                            }
+                                            )(
+                                                <Input placeholder={item.placeholder ? item.placeholder[i] : ''} onClick={(e) => {
+                                                    if (item.onClick instanceof Function) {
+                                                        item.onClick(e)
+                                                    }
+                                                }} onFocus={(e) => {
+                                                    if (item.onFocus instanceof Function) {
+                                                        item.onFocus(e, i)
+                                                    }
+                                                }} onBlur={(e) => {
+                                                    if (item.onBlur instanceof Function) {
+                                                        item.onBlur(e, i)
+                                                    }
+                                                }} onChange={(e) => {
+                                                    if (item.onChange instanceof Function) {
+                                                        item.onChange(e, i)
+                                                    }
+                                                }} />
                                             )
                                         }
                                     </Col>
                                 )
                             })
+                        }
+                        {
+                            this.state.textGroupValidate !== '' &&
+                                <div className="ant-form-explain" style={{ color:'#f04134' }}>{this.state.textGroupValidate}</div>
                         }
                     </InputGroup>
                 )
@@ -565,7 +642,7 @@ class QueryForm extends React.Component {
                         }
                     </RadioGroup>
                 )
-            // radioButton
+            // checkboxGroup
             case 'checkboxGroup':
                 const options = []
                 item.option.options.map((o) => {
@@ -582,15 +659,47 @@ class QueryForm extends React.Component {
                 })(
                     <CheckboxGroup options={options} disabled={item.disabled} size="large" style={item.option.style} onChange={(val) => this.handleSelectChange(item.option, val)} />
                 )
+            case 'file':
+                return getFieldDecorator(item.fieldName, {
+                    valuePropName: 'fileList',
+                    getValueFromEvent: this.normFile,
+                    ...rules
+                })(
+                    <Upload {...item.uploadProps}>
+                        <Button>
+                            <Icon type="upload" /> 上传
+                        </Button>
+                    </Upload>
+                )
+            case 'placeholder':
+                return <div style={item.style}>{item.text || ''}</div>
             // 其他默认为普通input
             default:
                 return getFieldDecorator(item.fieldName, {
                     initialValue: item.initialValue || '',
                     ...rules
                 })(
-                    <Input type={item.type} maxLength="99" placeholder={item.placeholder || ''} disabled={item.disabled} onChange={(e) => item.onChange(e.target.value)} />
+                    <Input type={item.type} placeholder={item.placeholder || ''} disabled={item.disabled} onChange={(e) => item.onChange(e.target.value)} onClick={(e) => {
+                        if (item.onClick instanceof Function) {
+                            item.onClick(e)
+                        }
+                    }} onFocus={(e) => {
+                        if (item.onFocus instanceof Function) {
+                            item.onFocus(e)
+                        }
+                    }} onBlur={(e) => {
+                        if (item.onBlur instanceof Function) {
+                            item.onBlur(e)
+                        }
+                    }} />
                 )
         }
+    }
+    normFile = (e) => {
+        if (Array.isArray(e)) {
+            return e
+        }
+        return e && e.fileList
     }
     _renderChildren(options) {
         const formItemLayout = {
@@ -600,17 +709,28 @@ class QueryForm extends React.Component {
         const { colSpan, edit } = this.props
         let children = []
         options.forEach((item, i) => {
-            children.push(
-                <Col span={colSpan || 8} key={i}>
-                    <FormItem {...formItemLayout} label={item.fieldLabel}>
-                        {
-                            !edit ?
-                                this._renderFormItem(item) :
-                                item.text
-                        }
-                    </FormItem>
-                </Col>
-            )
+            const popovers = []
+            if (item.popover && item.popover.length) {
+                item.popover.forEach((item1, i) => {
+                    popovers.push(<p key={'Popover' + item1.id + '-' + i}>{item1.label}：{item1.value}</p>)
+                })
+            }
+            if (typeof item.display === 'undefined' || item.display) {
+                children.push(
+                    <Col span={colSpan || 8} key={i}>
+                        <FormItem {...formItemLayout} label={item.fieldLabel}>
+                            {
+                                !edit ? this._renderFormItem(item) : <div style={item.style}>
+                                    {item.text}
+                                    {popovers.length ? <Popover content={<div>{popovers}</div>} placement="right">
+                                        <Icon type="question-circle" style={{ cursor: 'pointer' }} />
+                                    </Popover> : ''}
+                                </div>
+                            }
+                        </FormItem>
+                    </Col>
+                )
+            }
         })
         this.isInit = false
         this.state.isClear = false
@@ -623,8 +743,6 @@ class QueryForm extends React.Component {
         const expand = this.state.expand
         const children = this._renderChildren(ordinaryOptions)
         const shownCount = expand ? children.length : showSearch === undefined ? showCols : children.length
-        const captchaText = '收起'
-        const expandText = '展开'
         if (ordinaryOptions && ordinaryOptions.length > 0) {
             return (
                 <Form style={this.props.style} className={showSearch === undefined ? 'ant-advanced-search-form query-list-from' : 'ant-advanced-search-form query-list-from query-list-from-edit'}
@@ -651,7 +769,7 @@ class QueryForm extends React.Component {
                                     {
                                         (children.length > showCols && !advancedOptions.length) &&
                                             <a style={{ marginLeft: 8, fontSize: 12 }} onClick={this.toggle}>
-                                                {expand ? captchaText : expandText} <Icon type={expand ? 'up' : 'down'} />
+                                                {expand ? '收起' : '展开'} <Icon type={expand ? 'up' : 'down'} />
                                             </a>
                                     }
                                     {
@@ -667,9 +785,7 @@ class QueryForm extends React.Component {
                 </Form>
             )
         } else {
-            return (
-                <div>Loading...</div>
-            )
+            return (<div>Loading...</div>)
         }
     }
     // 普通下拉框选择

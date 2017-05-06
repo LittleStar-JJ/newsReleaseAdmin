@@ -11,7 +11,7 @@ class CommentEdit extends React.Component {
         CommentEdit: React.PropTypes.object,
 
         clearState: React.PropTypes.func,
-        getClassifyById: React.PropTypes.func
+        getCommentById: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
@@ -27,7 +27,7 @@ class CommentEdit extends React.Component {
     }
     componentWillMount() {
         if (this.id) {
-            //  this.props.getClassifyById(this.id)
+            //  this.props.getCommentById(this.id)
         }
     }
     componentWillReceiveProps(nextProps) {
@@ -41,52 +41,35 @@ class CommentEdit extends React.Component {
             this.props.clearState()
         }
     }
-    convertStatus = (statusObj) => {
-        let arr = []
-        Object.keys(statusObj).map((key) => {
-            arr.push({ id: key, name:statusObj[key] })
-        })
-        return arr
-    }
     render() {
         const commentDetail = this.state.commentDetail || {}
-        const optionsWithDisabled = [
-            { label: 'Apple', value: 'Apple' },
-            { label: 'Pear', value: 'Pear' },
-            { label: 'Orange', value: 'Orange', disabled: false }
-        ]
         const options = [
             {
                 type:'html',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'新闻标题',
                 fieldName:'name',
                 text:''
             },
             {
                 type:'html',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'用户名',
                 fieldName:'user.name',
                 text:''
             },
             {
                 type:'html',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'留言内容',
                 fieldName:'content',
                 text:''
             },
             {
                 type:'html',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'评论时间',
                 fieldName:'createdAt',
                 text:''
             },
             {
                 type:'html',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'状态',
                 fieldName:'status',
                 text:''

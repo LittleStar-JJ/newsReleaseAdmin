@@ -77,7 +77,7 @@ class UesrEdit extends React.Component {
                 onChange:() => {}
             },
             {
-                type:'password',
+                type:'text',
                 rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'密码',
                 disabled:this.state.disabled,
@@ -198,6 +198,7 @@ class UesrEdit extends React.Component {
 
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value) => {
+            console.log('fffff', value)
             value.birthday = value.birthday.format('x')
             console.log('aaaaaa', value)
             if (!this.id) {

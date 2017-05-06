@@ -21,7 +21,7 @@ export function getUesrById(id) {
         } */
         type: 'RECEIVE_USER',
         response: {
-            data: [{
+            data: {
                 id:1,
                 nickName:1,
                 email:2,
@@ -38,7 +38,7 @@ export function getUesrById(id) {
                 phone:1,
                 name:1,
                 status:'ENABLE'
-            }]
+            }
         }
     }
 }
