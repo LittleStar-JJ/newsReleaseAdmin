@@ -62,13 +62,14 @@ export default class LeftMenu extends React.Component {
                 this.recursionItems(sub.child, '/' + match[1])
             })
         }
-        return this.currentItem.toString()
+        console.log('dsad', this.currentItem)
+        return this.currentItem
     }
     recursionItems = (items, pathname, pre) => {
         items.forEach((item, i) => {
             if (!this.currentItem) {
                 if (item.router === pathname) {
-                    this.currentItem = (pre || {}).id || item.id
+                    this.currentItem = pre ? (pre || {}).id.toString() : item.id.toString()
                     return false
                 } else if (item.child) {
                     this.recursionItems(item.child, pathname, item.child)
