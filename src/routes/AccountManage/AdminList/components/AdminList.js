@@ -1,12 +1,11 @@
 import React from 'react'
 import { Button, message, Modal } from 'antd'
 import moment from 'moment'
-import { CommonStatus } from '../../../../constants/Status'
+import { CommonStatus, BtnOperation } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
 import BtnPermission from '../../../../components/BtnPermission'
-import { BtnOperation } from '../../../../constants/Status'
 
 export default class AdminList extends React.Component {
     static propTypes = {
