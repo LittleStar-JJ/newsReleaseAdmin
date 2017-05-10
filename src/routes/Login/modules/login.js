@@ -8,7 +8,7 @@ const RECEIVE_USER = 'RECEIVE_USER' // 接受用户
 const RECEIVE_CHANNER = 'RECEIVE_CHANNER' // 接受渠道
 
 import { CommonAction } from '../../../constants/ActionTypes'
-import { RegisterApi, ChannelApi } from '../../../constants/Api'
+import { LoginApi } from '../../../constants/Api'
 const consts = require('../../../../config/config.json')[NODE_ENV.toUpperCase()]
 
 export function clearState() {
@@ -21,87 +21,11 @@ export function singIn(user) {
     return {
         [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_USER, CommonAction.REQUEST_FAILURE + '_LOGIN' ],
-            endpoint: RegisterApi.login,
+            endpoint: LoginApi.login,
             options: { body: user,
                 method:'POST'
             }
         }
-    }
-}
-// 注册
-export function register(user) {
-    return {
-        [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_USER, CommonAction.REQUEST_FAILURE + '_LOGIN' ],
-            endpoint: RegisterApi.register,
-            options: { body: {
-                email: user.email,
-                password: user.password,
-                username: user.userName,
-                channelId: user.channelId,
-                activateUrl: consts.cdnHost + ':' + consts.port + '/login/activation/'
-            },
-                method:'POST'
-            }
-        }
-    }
-}
-export function channer(user) {
-    return {
-        [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_CHANNER, CommonAction.REQUEST_FAILURE + '_LOGIN' ],
-            endpoint: ChannelApi.getChannel,
-            options: {
-                body: {
-                    page:0,
-                    size:30,
-                    sort:'id,desc'
-                },
-                method:'GET' }
-        }
-    }
-}
-// 登出
-export function singOut(user = {}) {
-    return {
-        type: LOGIN_SINGOUT
-    }
-}
-// 接受用户信息
-export function receiveUser(user = {}) {
-    return {
-        type: RECEIVE_USER,
-        payload:{
-            User:user
-        }
-    }
-}
-/**
- * 登录
- * @param user
- * @returns {function(*, *)}
- */
-export function fetchLogin(user) {
-    return (dispatch, getState) => {
-        dispatch(singIn(user))
-    }
-}
-/**
- * 注册
- * @param user
- * @returns {function(*, *)}
- */
-export function fetchRegister(user) {
-    return (dispatch, getState) => {
-        dispatch(register(user))
-    }
-}
-/**
- * 获取渠道
- */
-export function getChannel() {
-    return (dispatch, getState) => {
-        dispatch(channer())
     }
 }
 const initialState = {

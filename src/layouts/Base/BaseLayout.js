@@ -10,4 +10,27 @@ export default class BaseLayout extends React.Component {
     }
     changeLocale(e) {
     }
+    /**
+     * 递归菜单结构
+     * @param menus 菜单数据
+     */
+    recursiveMenu = (menus) => {
+        const firstMenu = menus.filter((item) => item.parent_id === 0)
+        firstMenu.map((item) => {
+            this.setMenusData(item.id, item, menus)
+        })
+        return firstMenu
+    }
+    setMenusData = (id, firstMenu, menus) => {
+        const find = menus.filter((v) => {
+            return id === v.parent_id
+        })
+        if (find.length) {
+            find.map((f) => {
+                f.key = `${id}-${f.id}`
+                firstMenu.child = find
+                this.setMenusData(f.id, f, menus)
+            })
+        }
+    }
 }

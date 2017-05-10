@@ -286,7 +286,7 @@ class QueryForm extends React.Component {
         if (this.catchOptions && this.catchOptions !== next) {
             this.catchOptions.forEach((item) => {
                 next.forEach((item2) => {
-                    if (item.fieldName === item2.fieldName) {
+                    if (JSON.stringify(item.fieldName) === JSON.stringify(item2.fieldName)) {
                         switch (item2.type) {
                             case 'text':
                             case 'textArea':
@@ -297,11 +297,13 @@ class QueryForm extends React.Component {
                             case 'select':
                             case 'inputSearch':
                             case 'selectSearch':
-                                if (item.option.selected !== item2.option.selected) {
-                                    fieldsValue[item2.fieldName] = item2.option.selected
-                                }
-                                if (item.option.options !== item2.option.options) {
-                                    // fieldsValue['selectUpdate'] = true
+                                if (item.option.selected !== item2.option.selected || JSON.stringify(item.option.options) !== JSON.stringify(item2.option.options)) {
+                                    item2.option.selected = item2.option.selected !== '' && typeof item2.option.selected !== 'undefined' ?
+                                        item2.option.selected.toString() : item2.option.selected
+                                    let _newOp = item.option.options.filter((o) => {
+                                        return (o[item2.option.valueField]).toString() === item2.option.selected
+                                    })
+                                    fieldsValue[item2.fieldName] = _newOp.length ? item2.option.selected : undefined
                                 }
                                 break
                             case 'rangePicker':
@@ -325,9 +327,25 @@ class QueryForm extends React.Component {
                                     this.state.switchs[item.fieldName] = item2.option.initialValue
                                 }
                                 break
+                            case 'textGroup':
+                                if (JSON.stringify(item.initialValue) !== JSON.stringify(item2.initialValue)) {
+                                    item.fieldName.forEach((f, i) => {
+                                        fieldsValue[f] = item2.initialValue[i]
+                                    })
+                                }
+                                break
+                            case 'checkboxGroup':
+                                if (item.option.options !== item2.option.options) {
+                                    fieldsValue['checkboxGroupUpdate'] = true
+                                }
+                                if (item.option.selected !== item2.option.selected) {
+                                    console.log('qqqq', item2.option.selected)
+                                    fieldsValue[item.fieldName] = item2.option.selected
+                                }
+                                break
                             case 'html':
                                 if (item.text !== item2.text) {
-                                    // fieldsValue['htmlUpdate'] = true
+                                    fieldsValue['htmlUpdate'] = true
                                 }
                                 break
                         }
@@ -423,8 +441,13 @@ class QueryForm extends React.Component {
             // 普通下拉框
             case 'select':
                 item.option.options = item.option.options || []
+                item.option.selected = item.option.selected !== '' && typeof item.option.selected !== 'undefined' ?
+                    item.option.selected.toString() : item.option.selected
+                let _newOp = item.option.options.filter((o) => {
+                    return (o[item.option.valueField]).toString() === item.option.selected
+                })
                 return getFieldDecorator(item.fieldName, {
-                    initialValue:item.option.selected === '' ? undefined : item.option.selected,
+                    initialValue:item.option.selected === '' ? undefined : _newOp.length ? item.option.selected : '',
                     ...rules
                 })(
                     <Select disabled={item.disabled} size="large" style={item.option.style} placeholder={item.option.placeholder} onChange={(val) => this.handleSelectChange(item.option, val)}>
@@ -439,8 +462,14 @@ class QueryForm extends React.Component {
                 )
             // 下拉框带搜索
             case 'selectSearch':
+                item.option.options = item.option.options || []
+                item.option.selected = item.option.selected !== '' && typeof item.option.selected !== 'undefined' ?
+                    item.option.selected.toString() : item.option.selected
+                let _newOpt = item.option.options.filter((o) => {
+                    return (o[item.option.valueField]).toString() === item.option.selected
+                })
                 return getFieldDecorator(item.fieldName, {
-                    initialValue:item.option.selected === '' ? undefined : item.option.selected,
+                    initialValue:item.option.selected === '' ? undefined : _newOpt.length ? item.option.selected : '',
                     ...rules
                 })(
                     <Select disabled={item.disabled} style={item.option.style} showSearch placeholder={item.option.placeholder} optionFilterProp="children"
@@ -645,8 +674,9 @@ class QueryForm extends React.Component {
             // checkboxGroup
             case 'checkboxGroup':
                 const options = []
+                item.option.options = item.option.options || []
                 item.option.options.map((o) => {
-                    let val = o[item.option.valueField] ? o[item.option.valueField].toString() : o.value.toString()
+                    let val = o[item.option.valueField] ? o[item.option.valueField] : o.value
                     let text = o[item.option.textField] ? o[item.option.textField].toString() : o.text
                     options.push({
                         label:text,

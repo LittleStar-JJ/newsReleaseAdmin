@@ -9,8 +9,8 @@ import Login from './Login'
 import AdminList from './AccountManage/AdminList'
 import UserList from './AccountManage/UserList'
 import UserEdit from './AccountManage/UserEdit'
-import AuthorityList from './AuthorityManage/AuthorityList'
-import AuthorityEdit from './AuthorityManage/AuthorityEdit'
+import AuthorityList from './AuthorityManage/Authortity/AuthorityList'
+import AuthorityEdit from './AuthorityManage/Authortity/AuthorityEdit'
 import ClassifyList from './ClassifyManage/ClassifyList'
 import ClassifyEdit from './ClassifyManage/ClassifyEdit'
 import NewsList from './NewsManage/NewsList'
@@ -19,6 +19,9 @@ import LinksList from './WebsiteManage/LinksList'
 import SiteConfig from './WebsiteManage/SiteConfig'
 import CommentList from './CommentManage/CommentList'
 import CommentEdit from './CommentManage/CommentEdit'
+import MenusEdit from './AuthorityManage/Menus/MenusEdit'
+import MenusList from './AuthorityManage/Menus/MenusList'
+import OperationList from './AuthorityManage/Operations/OperationList'
 
 export const createRoutes = (store) => ([
     {
@@ -38,8 +41,10 @@ export const createRoutes = (store) => ([
             LinksList(store),
             SiteConfig(store),
             CommentList(store),
-            CommentEdit(store)
-
+            CommentEdit(store),
+            MenusEdit(store),
+            MenusList(store),
+            OperationList(store)
         ]
     },
     {

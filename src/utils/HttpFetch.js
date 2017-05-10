@@ -47,8 +47,8 @@ function dealWithCommonParmas(options) {
         parmasKeys.forEach((key) => {
             let value = body[key]
             let keyValue = ''
-            if (typeof value === 'undefined' || (typeof value === 'string' && value.trim() === '') ||
-                (typeof value === 'object' && typeof value.length === 'number' && !value.length)
+            if (!value || typeof value === 'undefined' || (typeof value === 'string' && value.trim() === '') ||
+                (value && typeof value === 'object' && typeof value.length === 'number' && !value.length)
             ) {
                 delete body[key]
             } else {
@@ -61,9 +61,9 @@ function dealWithCommonParmas(options) {
     let sign = Encrypt.md5(keysAndValues).toUpperCase()
     sign = Encrypt.md5(sign + 'OBORSERVICE_TOKEN_SIGN_OS').toUpperCase()
     options.body = body
-    const commonHeaders = { 'X-Yootai-Api-Version':'2.4', 'Cache-Control': 'no-cache', sign:sign, 'user-agent': 'OBORRservice' }
-    options.headers = options.headers ? { ...options.headers, commonHeaders } : commonHeaders
-    options.mode = 'cors'
+    // const commonHeaders = { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }
+    // options.headers = options.headers ? { ...options.headers, commonHeaders } : commonHeaders
+    // options.mode = 'cors'
     return options
 }
 

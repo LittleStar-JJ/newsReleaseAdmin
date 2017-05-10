@@ -5,27 +5,26 @@ import React from 'react'
 import { Link, browserHistory } from 'react-router'
 import { Menu, Icon } from 'antd'
 const SubMenu = Menu.SubMenu
-const reg = /^(\/)(items)(\/)?/
+const reg = /^\/(\w+)\/?/
 
 export default class LeftMenu extends React.Component {
     static propTypes = {
-        menus: React.PropTypes.object.isRequired
+        menus: React.PropTypes.array.isRequired,
+        mode: React.PropTypes.string
     }
     constructor(props) {
         super(props)
-        // this.handleClick = this.handleClick.bind(this)
+        this.handleClick = this.handleClick.bind(this)
         this.hasClick = false
         this.location = browserHistory.getCurrentLocation()
         this.defaultOpenKeys = []
+        this.currentItem = null
     }
-
     state={
         current:browserHistory.getCurrentLocation().pathname,
-        openKeys:[this.props.menus.subs[0].key]
+        openKeys:[]
     }
-
-    handleClick = (e) => {
-        console.log('sssssssss1')
+    handleClick(e) {
         this.hasClick = true
         this.setState({
             current: e.key
@@ -54,31 +53,48 @@ export default class LeftMenu extends React.Component {
         }
         return map[key] || []
     }
-    convertDetailPage() {
+    convertDetailPage = () => {
         this.location = browserHistory.getCurrentLocation()
         let match = location.pathname.match(reg)
-        return match && match[3] ? '/' + match[2] : location.pathname
+        this.currentItem = null
+        if (match && match[1]) {
+            this.props.menus.forEach((sub) => {
+                this.recursionItems(sub.child, '/' + match[1])
+            })
+        }
+        return this.currentItem.toString()
     }
-    _renderSubs(menus) {
+    recursionItems = (items, pathname, pre) => {
+        items.forEach((item, i) => {
+            if (!this.currentItem) {
+                if (item.router === pathname) {
+                    this.currentItem = (pre || {}).id || item.id
+                    return false
+                } else if (item.child) {
+                    this.recursionItems(item.child, pathname, item.child)
+                }
+            }
+        })
+        if (this.currentItem) return false
+    }
+    _renderSubs = (menus) => {
         const _pathName = this.location.pathname
-        let _this = this
-        return menus.map(function(item) {
-            if (item.items) {
+        return menus.map((item) => {
+            if (item.child) {
+                const title = <span><Icon type={item.icon} /><span>{item.name}</span></span>
                 return (
-                    <SubMenu key={item.key} name={item.name} title={item.title}>
+                    <SubMenu key={item.id} name={item.name} title={title}>
                         {
-                            item.items.map(function(item2) {
-                                if (_pathName === item2.router) {
-                                    _this.defaultOpenKeys = [item.key]
-                                }
-                                return <Menu.Item key={item2.router} name={item2.name}><Link to={item2.router}>{item2.name}</Link></Menu.Item>
-                            })
+                            this._renderSubs(item.child)
                         }
                     </SubMenu>
                 )
             } else {
+                if (_pathName === item.router) {
+                    this.defaultOpenKeys = [item.key]
+                }
                 return (
-                    <Menu.Item key={item.key}><Link to={item.router}>{item.title}</Link></Menu.Item>
+                    <Menu.Item key={item.id}><Link to={item.router}>{item.name}</Link></Menu.Item>
                 )
             }
         })
@@ -87,11 +103,10 @@ export default class LeftMenu extends React.Component {
         this.hasClick = false
         let { menus } = this.props
         let current = this.hasClick ? this.state.current : this.convertDetailPage()
-        const subs = this._renderSubs(menus.subs)
         return (
-            <Menu onClick={this.handleClick} selectedKeys={[current]} theme={menus.theme} mode="inline"
-              defaultOpenKeys={this.defaultOpenKeys} onOpenChange={this.onOpenChange} >
-                {subs}
+            <Menu onClick={this.handleClick} selectedKeys={[current]} theme="dark"
+              defaultOpenKeys={this.defaultOpenKeys} mode={this.props.mode} onOpenChange={this.onOpenChange} >
+                {this._renderSubs(menus)}
             </Menu>
         )
     }

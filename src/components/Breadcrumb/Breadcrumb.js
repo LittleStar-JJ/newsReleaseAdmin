@@ -8,7 +8,7 @@ const reg = /^(\/)(\w*)(\/)?/
 
 export default class Breadcrumbs extends React.Component {
     static propTypes = {
-        menus: React.PropTypes.object
+        menus: React.PropTypes.array
     }
     recursionCount = 0
     prevItems = []
@@ -18,11 +18,11 @@ export default class Breadcrumbs extends React.Component {
         let match = location.pathname.match(reg)
         let path = match ? '/' + match[2] : ''
         let _bread = [<Breadcrumb.Item key={'bread-0'}>{match ? <Link to="/">首页</Link> : '首页'}</Breadcrumb.Item>]
-        let subs = this.props.menus.subs
+        let subs = this.props.menus
         const _this = this
         subs.forEach(function(sub) {
-            if (sub.items) {
-                _this.recursionItems(sub.items, path, _bread)
+            if (sub.child) {
+                _this.recursionItems(sub.child, path, _bread)
             }
         })
         return _bread
@@ -39,10 +39,10 @@ export default class Breadcrumbs extends React.Component {
                     bread.push(<Breadcrumb.Item key={'bread-' + i + '-' + this.recursionCount}>{item.name}</Breadcrumb.Item>)
                 }
                 return false
-            } else if (item.items) {
+            } else if (item.child) {
                 this.recursionCount++
                 this.prevItems.push(item)
-                this.recursionItems(item.items, pathname, bread)
+                this.recursionItems(item.child, pathname, bread)
                 this.prevItems = []
                 this.recursionCount--
             }

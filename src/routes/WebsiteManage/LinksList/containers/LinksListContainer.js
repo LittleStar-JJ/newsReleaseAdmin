@@ -1,13 +1,13 @@
 import { connect } from 'react-redux'
-import { clearState, getLinksList, createMsg, updateMsg } from '../modules/linksList'
+import { clearState, getLinksList, createLinks, updateLinks } from '../modules/linksList'
 
 import LinksList from '../components/LinksList'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
     getLinksList: (query) => getLinksList(query),
-    createMsg: (query) => createMsg(query),
-    updateMsg: (query) => updateMsg(query)
+    createLinks: (query) => createLinks(query),
+    updateLinks: (query) => updateLinks(query)
 }
 
 const mapStateToProps = (state) => ({

@@ -1,29 +1,33 @@
 import React from 'react'
 import { Button, message, Modal } from 'antd'
 import moment from 'moment'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import { CommonStatus } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
+import BtnPermission from '../../../../components/BtnPermission'
+import { BtnOperation } from '../../../../constants/Status'
 
 export default class AdminList extends React.Component {
     static propTypes = {
         AdminList: React.PropTypes.object,
         getAdminList: React.PropTypes.func,
         clearState: React.PropTypes.func,
-        updateMsg: React.PropTypes.func,
-        createMsg: React.PropTypes.func
+        updateAdmin: React.PropTypes.func,
+        createAdmin: React.PropTypes.func,
+        getAuthList: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
     }
     state = {
         admins: [],
+        auths: [],
         create:{},
         update:{},
         newRandomKeys:Math.random(),
         modalVisible:false,
-        AdminOne:{}
+        AdminOne:null
     }
     constructor(props) {
         super(props)
@@ -49,6 +53,7 @@ export default class AdminList extends React.Component {
     }
     componentWillMount() {
         this.getAdmins()
+        this.props.getAuthList()
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.AdminList.admins) {
@@ -57,13 +62,30 @@ export default class AdminList extends React.Component {
             admins.map((item) => {
                 item.loginTime = moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                item.statusName = QuotePlanStatus[item.status]
+                item.statusName = CommonStatus[item.status]
             })
             this.setState({ admins: admins })
             this.props.clearState()
         }
+        if (nextProps.AdminList.auths) {
+            console.log('sss', nextProps.AdminList.auths)
+            this.setState({ auths:nextProps.AdminList.auths.content })
+            this.props.clearState()
+        }
         if (nextProps.AdminList.error) {
             message.error(nextProps.AdminList.error.error)
+            this.props.clearState()
+        }
+        if (nextProps.AdminList.update) {
+            message.success('修改成功')
+            this.setState({ modalVisible:false })
+            this.getAdmins()
+            this.props.clearState()
+        }
+        if (nextProps.AdminList.create) {
+            message.success('创建成功')
+            this.setState({ modalVisible:false })
+            this.getAdmins()
             this.props.clearState()
         }
     }
@@ -96,7 +118,7 @@ export default class AdminList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.state.auths,
                     selected:'',
                     onChange:(val) => {}
                 },
@@ -109,7 +131,7 @@ export default class AdminList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommonStatus),
                     onChange:(val) => {}
                 },
                 fieldLabel:'状态',
@@ -134,7 +156,7 @@ export default class AdminList extends React.Component {
             },
             {
                 title: '权限', // 标题
-                dataIndex: 'auth.name' // 字段名称
+                dataIndex: 'Auth.name' // 字段名称
             },
             {
                 title: '创建时间', // 标题
@@ -155,6 +177,7 @@ export default class AdminList extends React.Component {
                 btns:[
                     {
                         type:'link',
+                        authority:BtnOperation.编辑,
                         text:'编辑',
                         status:{
                             field:'status',
@@ -167,6 +190,7 @@ export default class AdminList extends React.Component {
                 ]
             }
         ]
+        console.log('aaa', AdminOne.authId)
         const modalOption = [
             {
                 type:'text',
@@ -186,29 +210,29 @@ export default class AdminList extends React.Component {
                 type:'text',
                 fieldLabel:'密码',
                 fieldName:'password',
-                initialValue:AdminOne.password,
+                initialValue:'',
                 onChange:() => {}
             },
             {
-                type:'selectSearch',
+                type:'select',
                 option:{
                     valueField:'id',
                     textField:'name',
                     placeholder:'权限',
-                    options:this.translateStatus(QuotePlanStatus),
-                    selected:(AdminOne.auth ? AdminOne.auth : {}).id,
+                    options:this.state.auths,
+                    selected:AdminOne.authId,
                     onChange:(val) => {}
                 },
                 fieldLabel:'权限',
-                fieldName:'auth'
+                fieldName:'auth_id'
             },
             {
-                type:'selectSearch',
+                type:'select',
                 option:{
                     valueField:'id',
                     textField:'name',
                     placeholder:'选择状态',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommonStatus),
                     selected:AdminOne.status,
                     onChange:(val) => {}
                 },
@@ -216,6 +240,16 @@ export default class AdminList extends React.Component {
                 fieldName:'status'
             }
         ]
+        if (this.state.AdminOne) {
+            modalOption[2].fieldLabel = '原始密码'
+            modalOption.splice(2, 0, {
+                type:'text',
+                fieldLabel:'新密码',
+                fieldName:'new_password',
+                initialValue:'',
+                onChange:() => {}
+            })
+        }
         const pagination = {
             total: this.pageTotalElement,
             showSizeChanger: true,
@@ -233,7 +267,9 @@ export default class AdminList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true, newRandomKeys:Math.random(), AdminOne: {} }) }}>账号创建</Button>
+                    <BtnPermission type={BtnOperation.添加}>
+                        <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true, newRandomKeys:Math.random(), AdminOne: null }) }}>账号创建</Button>
+                    </BtnPermission>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
@@ -251,11 +287,12 @@ export default class AdminList extends React.Component {
     }
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value1) => {
-            console.log('vvvvvvv', value1)
+            console.log('vvvvvvv', this.state.AdminOne)
             if (this.state.AdminOne) {
-                this.props.updateMsg({ id: this.state.AdminOne.id, admin: JSON.stringify(value1) })
+                value1.id = this.state.AdminOne.id
+                this.props.updateAdmin(value1)
             } else {
-                this.props.createMsg({ admin: JSON.stringify(value1) })
+                this.props.createAdmin(value1)
             }
         })
     }

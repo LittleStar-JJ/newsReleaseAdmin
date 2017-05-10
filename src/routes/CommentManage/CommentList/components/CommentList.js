@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, message } from 'antd'
 import moment from 'moment'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import { CommentStatus } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 
@@ -48,10 +48,15 @@ export default class ClassifyList extends React.Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.CommentList.commentList) {
             this.pageTotalElement = nextProps.CommentList.commentList.totalElement
-            const commentList = nextProps.CommentList.commentList
+            const commentList = nextProps.CommentList.commentList.content
             commentList.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                item.statusName = QuotePlanStatus[item.status]
+                if (item.status !== 'INIT') {
+                    item.updatedAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss')
+                } else {
+                    item.updatedAt = ''
+                }
+                item.statusName = CommentStatus[item.status]
             })
             this.setState({ commentList: commentList })
             this.props.clearState()
@@ -74,7 +79,7 @@ export default class ClassifyList extends React.Component {
             {
                 type:'text',
                 fieldLabel:'用户名',
-                fieldName:'user.name',
+                fieldName:'userNickName',
                 initialValue:'',
                 onChange:() => {}
             },
@@ -91,7 +96,7 @@ export default class ClassifyList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommentStatus),
                     onChange:(val) => {}
                 },
                 fieldLabel:'状态',
@@ -108,7 +113,7 @@ export default class ClassifyList extends React.Component {
         const gridColumns = [
             {
                 title: '用户名', // 标题
-                dataIndex: 'user.name' // 字段名称
+                dataIndex: 'User.nickName' // 字段名称
             },
             {
                 title: '内容', // 标题
@@ -116,7 +121,7 @@ export default class ClassifyList extends React.Component {
             },
             {
                 title: '新闻标题', // 标题
-                dataIndex: 'news.title' // 字段名称
+                dataIndex: 'News.title' // 字段名称
             },
             {
                 title: '状态', // 标题
@@ -125,6 +130,10 @@ export default class ClassifyList extends React.Component {
             {
                 title: '评论时间', // 标题
                 dataIndex: 'createdAt' // 字段名称
+            },
+            {
+                title: '审核时间', // 标题
+                dataIndex: 'updatedAt' // 字段名称
             },
             {
                 title: '操作',
@@ -160,11 +169,12 @@ export default class ClassifyList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/authorityEdit')}>添加权限</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
+                    <br />
                 </div>
+                <br />
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={commentList} pagination={pagination} />
                 </div>

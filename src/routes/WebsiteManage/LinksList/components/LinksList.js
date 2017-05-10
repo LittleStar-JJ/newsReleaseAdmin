@@ -1,29 +1,31 @@
 import React from 'react'
 import { Tabs, Button, message, Modal } from 'antd'
 import moment from 'moment'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import { CommonStatus } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
+import ResponseCode from '../../../../utils/ResponseCode'
 
 export default class LinksList extends React.Component {
     static propTypes = {
         LinksList: React.PropTypes.object,
         getLinksList: React.PropTypes.func,
         clearState: React.PropTypes.func,
-        updateMsg: React.PropTypes.func,
-        createMsg: React.PropTypes.func
+        createLinks: React.PropTypes.func,
+        updateLinks: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
     }
     state = {
         links: [],
+        fileList: [],
         create:{},
         update:{},
         modalVisible:false,
         newRandomKeys:Math.random(),
-        LinksOne:{}
+        LinksOne:null
     }
     constructor(props) {
         super(props)
@@ -41,7 +43,7 @@ export default class LinksList extends React.Component {
         this.getLinks()
     }
     componentWillMount() {
-        // this.getLinks()
+        this.getLinks()
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.LinksList.links) {
@@ -49,9 +51,21 @@ export default class LinksList extends React.Component {
             const links = nextProps.LinksList.links.content
             links.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                item.statusName = WorkOrderStatus[item.status]
+                item.statusName = CommonStatus[item.status]
             })
             this.setState({ links: links })
+            this.props.clearState()
+        }
+        if (nextProps.LinksList.create) {
+            message.success('创建成功')
+            this.getLinks()
+            this.setState({ LinksOne:null })
+            this.props.clearState()
+        }
+        if (nextProps.LinksList.update) {
+            message.success('修改成功')
+            this.getLinks()
+            this.setState({ LinksOne:null })
             this.props.clearState()
         }
         if (nextProps.LinksList.error) {
@@ -65,16 +79,7 @@ export default class LinksList extends React.Component {
         })
     }
     render() {
-        // const links = this.state.links || []
-        const links = [
-            {
-                name:1,
-                url:2,
-                sort:2,
-                createdAt:11111111,
-                statusName:'启用'
-            }
-        ]
+        const links = this.state.links || []
         const LinksOne = this.state.LinksOne || {}
         const queryOptions = [
             {
@@ -90,7 +95,7 @@ export default class LinksList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommonStatus),
                     onChange:(val) => {}
                 },
                 fieldLabel:'状态',
@@ -158,7 +163,7 @@ export default class LinksList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'选择状态',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommonStatus),
                     selected:LinksOne.status,
                     onChange:(val) => {}
                 },
@@ -254,11 +259,12 @@ export default class LinksList extends React.Component {
     }
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value1) => {
-            if (this.id) {
-                admin.id = this.id
-                this.props.updateMsg({ admin: JSON.stringify(value1) })
+            value1.icon = '' // this.state.fileList
+            if (this.state.LinksOne) {
+                value1.id = this.state.LinksOne.id
+                this.props.updateLinks(value1)
             } else {
-                this.props.createMsg({ admin: JSON.stringify(value1) })
+                this.props.createLinks(value1)
             }
             this.setState({ modalVisible:false })
         })

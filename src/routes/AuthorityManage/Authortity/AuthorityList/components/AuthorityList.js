@@ -1,8 +1,8 @@
 import React from 'react'
 import { Button, message } from 'antd'
 import moment from 'moment'
-import TableGrid from '../../../../components/TableGrid'
-import QueryList from '../../../../components/QueryList'
+import TableGrid from '../../../../../components/TableGrid'
+import QueryList from '../../../../../components/QueryList'
 
 export default class AuthorityList extends React.Component {
     static propTypes = {
@@ -32,26 +32,16 @@ export default class AuthorityList extends React.Component {
         this.query = value
         this.getAuthoritys()
     }
-    getGridOperationState = (s) => {
-        let gridOperationState = []
-        Object.keys(WorkOrderStatus).forEach((key) => {
-            if (key === s) {
-                gridOperationState.push({ [key]:{ show: true } })
-            } else {
-                gridOperationState.push({ [key]:{ show: false } })
-            }
-        })
-        return gridOperationState
-    }
     componentWillMount() {
         this.getAuthoritys()
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.AuthorityList.authorityList) {
             this.pageTotalElement = nextProps.AuthorityList.authorityList.totalElement
-            const authorityList = nextProps.AuthorityList.authorityList
+            const authorityList = nextProps.AuthorityList.authorityList.content
             authorityList.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
+                item.updatedAt = moment(item.updatedAt).format('YYYY-MM-DD HH:mm:ss')
             })
             this.setState({ authorityList: authorityList })
             this.props.clearState()
@@ -66,7 +56,7 @@ export default class AuthorityList extends React.Component {
         const queryOptions = [
             {
                 type:'text',
-                fieldLabel:'权限名称',
+                fieldLabel:'角色名称',
                 fieldName:'name',
                 initialValue:'',
                 onChange:() => {}
@@ -74,12 +64,17 @@ export default class AuthorityList extends React.Component {
         ]
         const gridColumns = [
             {
-                title: '权限名称', // 标题
-                dataIndex: 'name' // 字段名称
+                title: '角色名称', // 标题
+                dataIndex: 'name', // 字段名称
+                width:'30%'
             },
             {
                 title: '创建时间', // 标题
                 dataIndex: 'createdAt' // 字段名称
+            },
+            {
+                title: '修改时间', // 标题
+                dataIndex: 'updatedAt' // 字段名称
             },
             {
                 title: '操作',

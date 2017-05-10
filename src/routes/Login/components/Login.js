@@ -33,8 +33,7 @@ const Login = Form.create()(React.createClass({
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 this.isValidate = true
-                // this.props.singIn(values)
-                this.context.router.push('/')
+                this.props.singIn(values)
             }
         })
     },
@@ -85,10 +84,10 @@ const Login = Form.create()(React.createClass({
         return (
             <div className="login-container">
                 <div className="login-window">
-                    <h3 style={{ textAlign:'center', color:'#f5f5f5', marginBottom:'10px' }}>跨境云平台端</h3>
+                    <h3 style={{ textAlign:'center', color:'#f5f5f5', marginBottom:'10px' }}>新闻发布后台系统</h3>
                     <Form onSubmit={this.handleSubmitLogin} className="login-form">
                         <FormItem>
-                            {getFieldDecorator('username', {
+                            {getFieldDecorator('name', {
                                 rules: [{
                                     required: true, message: '请输入用户名！'
                                 }]

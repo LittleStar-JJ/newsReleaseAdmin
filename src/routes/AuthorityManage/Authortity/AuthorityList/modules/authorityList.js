@@ -1,29 +1,21 @@
-import { CALL_API } from '../../../../middleware/api'
-import { CommonAction } from '../../../../constants/ActionTypes'
+import { CALL_API } from '../../../../../middleware/api'
+import { CommonAction } from '../../../../../constants/ActionTypes'
 
-const CLEAR_USERS = 'CLEAR_USERS'
+const CLEAR_AUTHORITY_LIST = 'CLEAR_AUTHORITY_LIST'
 const RECEIVE_AUTHORITY_LIST = 'RECEIVE_AUTHORITY_LIST'
-import { BookApi } from '../../../../constants/Api'
+import { AuthorityApi } from '../../../../../constants/Api'
 
 export function clearState() {
     return {
-        type: CLEAR_USERS
+        type: CLEAR_AUTHORITY_LIST
     }
 }
 export function getAuthorityList(query) {
     return {
-        /* [CALL_API]: {
+        [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_AUTHORITY_LIST, CommonAction.REQUEST_FAILURE + 'USER' ],
-            endpoint: BookApi.getList,
+            endpoint: AuthorityApi.getList,
             options: { body: query, method:'GET' }
-        } */
-        type: 'RECEIVE_AUTHORITY_LIST',
-        response: {
-            data: [{
-                id:1,
-                name:1,
-                createdAt:12222222222222
-            }]
         }
     }
 }
@@ -40,7 +32,7 @@ const ACTION_HANDLERS = {
     [RECEIVE_AUTHORITY_LIST] : (state, action) => {
         return ({ ...state, fetching: false, authorityList: action.response.data, error: null })
     },
-    [CLEAR_USERS] : () => {
+    [CLEAR_AUTHORITY_LIST] : () => {
         return ({ ...initialState })
     }
 }

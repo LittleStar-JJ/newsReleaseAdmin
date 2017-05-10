@@ -2,14 +2,14 @@ import React from 'react'
 import moment from 'moment'
 import { Button, Popconfirm, message, Form, Row, Col } from 'antd'
 import OBOREdit from '../../../../components/OBOREdit'
-import { QuotePlanStatus, genderStatus } from '../../../../constants/Status'
+import { SiteStatus } from '../../../../constants/Status'
 
 class SiteConfig extends React.Component {
     static propTypes = {
         form: React.PropTypes.object,
         params: React.PropTypes.object,
         SiteConfig: React.PropTypes.object,
-
+        getSite: React.PropTypes.func,
         clearState: React.PropTypes.func,
         saveMsg: React.PropTypes.func
     }
@@ -18,12 +18,19 @@ class SiteConfig extends React.Component {
     }
     state = {
         disabled:false,
-        save:{}
+        detail:{}
     }
-    componentWillMount() {}
+    componentWillMount() {
+        this.props.getSite()
+    }
     componentWillReceiveProps(nextProps) {
+        if (nextProps.SiteConfig.detail) {
+            this.setState({ detail:nextProps.SiteConfig.detail })
+            this.props.clearState()
+        }
         if (nextProps.SiteConfig.save) {
-
+            message.success('保存成功')
+            this.props.clearState()
         }
         if (nextProps.SiteConfig.error) {
             message.error(nextProps.SiteConfig.error.error)
@@ -38,7 +45,7 @@ class SiteConfig extends React.Component {
         return arr
     }
     render() {
-        const classifyDetail = this.state.classifyDetail || {}
+        const detail = this.state.detail || {}
         const options = [
             {
                 type:'text',
@@ -47,6 +54,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'name',
                 placeholder:'请输入',
+                initialValue:detail.name,
                 onChange:() => {}
             },
             {
@@ -56,6 +64,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'title',
                 placeholder:'请输入',
+                initialValue:detail.title,
                 onChange:() => {}
             },
             {
@@ -65,6 +74,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'keyWords',
                 placeholder:'请输入',
+                initialValue:detail.keyWords,
                 onChange:() => {}
             },
             {
@@ -74,8 +84,8 @@ class SiteConfig extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.convertStatus(QuotePlanStatus),
-                    // selected:classifyDetail.status,
+                    options:this.convertStatus(SiteStatus),
+                    selected:detail.status,
                     onChange:(val) => {}
                 },
                 disabled:false,
@@ -88,6 +98,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'description',
                 placeholder:'请输入',
+                initialValue:detail.name,
                 onChange:() => {}
             },
             {
@@ -97,7 +108,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'statisticsCode',
                 placeholder:'请输入',
-                initialValue:classifyDetail.sort,
+                initialValue:detail.statisticsCode,
                 onChange:() => {}
             },
             {
@@ -107,6 +118,7 @@ class SiteConfig extends React.Component {
                 disabled:this.state.disabled,
                 fieldName:'message',
                 placeholder:'请输入',
+                initialValue:detail.message,
                 onChange:() => {}
             }
         ]
@@ -114,13 +126,7 @@ class SiteConfig extends React.Component {
         return (
             <div className="page-container page-detail">
                 <div className="page-top-btns">
-                    {
-                        <div>
-                            <Popconfirm title="保存信息不可修改，是否确认？" onConfirm={(e) => { this.save(e) }}>
-                                <Button type="primary">保存</Button>
-                            </Popconfirm>
-                        </div>
-                    }
+                    <Button type="primary" onClick={(e) => { this.save(e) }}>保存</Button>
                 </div>
                 <div style={{ width: '50%' }}>
                     <OBOREdit options={options} colSpan={24} ref="OBOREdit1" />
@@ -131,7 +137,7 @@ class SiteConfig extends React.Component {
 
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value) => {
-            this.props.saveMsg({ freightBill:JSON.stringify(value) })
+            this.props.saveMsg(value)
         })
     }
 }

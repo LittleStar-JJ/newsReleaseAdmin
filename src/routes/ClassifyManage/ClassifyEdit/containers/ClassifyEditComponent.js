@@ -1,16 +1,17 @@
 import { connect } from 'react-redux'
-import { clearState, getUesrById, createUser, updateUser } from '../modules/classifyEdit'
+import { clearState, getClassifyById, createClassify, updateClassify, getClassifyList } from '../modules/classifyEdit'
 import ClassifyEdit from '../components/ClassifyEdit'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
     getClassifyById: (id) => getClassifyById(id),
     createClassify: (query) => createClassify(query),
-    updateClassify: (query) => updateClassify(query)
+    updateClassify: (query) => updateClassify(query),
+    getClassifyList: (query) => getClassifyList(query)
 }
 
 const mapStateToProps = (state) => ({
-    UesrEdit : state.UesrEdit
+    ClassifyEdit : state.ClassifyEdit
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ClassifyEdit)

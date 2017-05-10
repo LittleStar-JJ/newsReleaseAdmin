@@ -3,9 +3,10 @@ import { CommonAction } from '../../../../constants/ActionTypes'
 
 const CLEAR_ADMINS = 'CLEAR_ADMINS'
 const RECEIVE_ADMIN_LIST = 'RECEIVE_ADMIN_LIST'
+const RECEIVE_AUTH_LIST = 'RECEIVE_AUTH_LIST'
 const RECEIVE_UPDATE_ADMIN = 'RECEIVE_UPDATE_ADMIN'
 const RECEIVE_CREATE_ADMIN = 'RECEIVE_CREATE_ADMIN'
-import { BookApi } from '../../../../constants/Api'
+import { AdminApi, AuthorityApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
@@ -14,58 +15,37 @@ export function clearState() {
 }
 export function getAdminList(query) {
     return {
-        /* [CALL_API]: {
+        [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_ADMIN_LIST, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
-            endpoint: BookApi.getList,
+            endpoint: AdminApi.getList,
             options: { body: query, method:'GET' }
-        } */
-        type: 'RECEIVE_ADMIN_LIST',
-        response:{
-            code:0,
-            data:{
-                totalElement: 1,
-                content: [
-                    {
-                        adminName:1,
-                        email:1,
-                        auth: {
-                            name:'启用',
-                            id:'ENABLE'
-                        },
-                        createdAt:'11111111',
-                        loginTime:'11111111',
-                        status:'ENABLE'
-                    }
-                ]
-            }
         }
     }
 }
-export function createMsg(query) {
+export function getAuthList(query) {
     return {
-        /* [CALL_API]: {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_AUTH_LIST, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            endpoint: AuthorityApi.getList,
+            options: { body: query, method:'GET' }
+        }
+    }
+}
+export function createAdmin(query) {
+    return {
+        [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
-            endpoint: BookApi.getList,
-            options: { body: query, method:'GET' }
-        } */
-        type: 'RECEIVE_CREATE_ADMIN',
-        response: {
-            code: 0,
-            mag: ''
+            endpoint: AdminApi.create,
+            options: { body: query, method:'POST' }
         }
     }
 }
-export function updateMsg(query) {
+export function updateAdmin(query) {
     return {
-        /* [CALL_API]: {
+        [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
-            endpoint: BookApi.getList,
-            options: { body: query, method:'GET' }
-        } */
-        type: 'RECEIVE_UPDATE_ADMIN',
-        response: {
-            code: 0,
-            mag: ''
+            endpoint: AdminApi.update,
+            options: { body: query, method:'POST' }
         }
     }
 }
@@ -73,6 +53,7 @@ export function updateMsg(query) {
 const initialState = {
     fetching:false,
     admins:null,
+    auths:null,
     create:null,
     update:null,
     error:null
@@ -85,10 +66,13 @@ const ACTION_HANDLERS = {
         return ({ ...state, fetching: false, admins: action.response.data, error: null })
     },
     [RECEIVE_UPDATE_ADMIN] : (state, action) => {
-        return ({ ...state, fetching: false, update: action.response, error: null })
+        return ({ ...state, fetching: false, update: action.response.data, error: null })
     },
     [RECEIVE_CREATE_ADMIN] : (state, action) => {
-        return ({ ...state, fetching: false, create: action.response, error: null })
+        return ({ ...state, fetching: false, create: action.response.data, error: null })
+    },
+    [RECEIVE_AUTH_LIST] : (state, action) => {
+        return ({ ...state, fetching: false, auths: action.response.data, error: null })
     },
     [CLEAR_ADMINS] : () => {
         return ({ ...initialState })

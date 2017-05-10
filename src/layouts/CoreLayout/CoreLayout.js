@@ -48,11 +48,31 @@ const lMeuns = {
             items: [
                 {
                     router: '/authorityList',
-                    name: '权限列表',
+                    name: '角色列表',
                     items:[
                         {
                             router: '/authorityEdit',
-                            name: '权限编辑'
+                            name: '角色编辑'
+                        }
+                    ]
+                },
+                {
+                    router: '/menuList',
+                    name: '菜单列表',
+                    items:[
+                        {
+                            router: '/menuEdit',
+                            name: '菜单编辑'
+                        }
+                    ]
+                },
+                {
+                    router: '/operationList',
+                    name: '操作项列表',
+                    items:[
+                        {
+                            router: '/operationEdit',
+                            name: '菜单编辑'
                         }
                     ]
                 }
@@ -102,7 +122,7 @@ const lMeuns = {
                     name: '评论列表',
                     items:[
                         {
-                            router: '/newsDetail',
+                            router: '/commentEdit',
                             name: '评论查看'
                         }
                     ]
@@ -139,7 +159,9 @@ export class CoreLayout extends BaseLayout {
         Auth.dispatchAuthExpiredAction()
     }
     render() {
-        let meuns = lMeuns
+        const user = Auth.getAccount() || {}
+        const menuData = this.recursiveMenu(user.Auth.AuthMenu)
+        // let meuns = lMeuns
         const DropdownMenu = (
             <Menu>
                 <Menu.Item>
@@ -151,11 +173,11 @@ export class CoreLayout extends BaseLayout {
             <div className="ant-layout-aside">
                 <aside className="ant-layout-sider">
                     <div className="ant-layout-logo">&nbsp;</div>
-                    <LeftMenu menus={meuns} />
+                    <LeftMenu menus={menuData} mode="inline" />
                     <div className="user-bar">
                         <p>
                             <Dropdown overlay={DropdownMenu} trigger={['click']}>
-                                <a><Icon type="user" />&nbsp;&nbsp;<Icon className="dd-up" type="up" /></a>
+                                <a><Icon type="user" />&nbsp;&nbsp;<span className="nav-text">{user.adminName || ''}</span><Icon className="dd-up" type="up" /></a>
                             </Dropdown>
                         </p>
                     </div>
@@ -164,7 +186,7 @@ export class CoreLayout extends BaseLayout {
                     {/* <div className="ant-layout-header"></div> */}
                     <div className="ant-layout-breadcrumb">
                         {/* <LangSwitch changeLocale={this.changeLocale} /> */}
-                        <Breadcrumb menus={meuns} />
+                        <Breadcrumb menus={menuData} />
                     </div>
                     <div className="ant-layout-container">
                         <div className="ant-layout-content">

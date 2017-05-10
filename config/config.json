@@ -1,9 +1,9 @@
 {
   "DEVELOPMENT" : {
     "cdnHost"               : "http://localhost",
-    "apiHost"               : "http://139.129.21.97:3000",
+    "apiHost"               : "http://localhost:3000",
     "port"                  : 3001,
-    "compiler_public_path"  : "http://localhost:8082/"
+    "compiler_public_path"  : "http://localhost:3001/"
   },
 
   "PRODUCTION" : {

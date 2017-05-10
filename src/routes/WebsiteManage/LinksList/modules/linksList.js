@@ -5,61 +5,37 @@ const CLEAR_LINKS = 'CLEAR_LINKS'
 const RECEIVE_LINKS_LIST = 'RECEIVE_LINKS_LIST'
 const RECEIVE_UPDATE_LINKS = 'RECEIVE_UPDATE_LINKS'
 const RECEIVE_CREATE_LINKS = 'RECEIVE_CREATE_LINKS'
-import { BookApi } from '../../../../constants/Api'
+import { LinksApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
         type: CLEAR_LINKS
     }
 }
-export function getAdminList(query) {
+export function getLinksList(query) {
     return {
-        /* [CALL_API]: {
-         types: [ CommonAction.REQUEST_START, RECEIVE_LINKS_LIST, CommonAction.REQUEST_FAILURE + 'LINKS' ],
-         endpoint: BookApi.getList,
-         options: { body: query, method:'GET' }
-         } */
-        type: 'RECEIVE_LINKS_LIST',
-        response: {
-            data: [{
-                adminName:1,
-                email:2,
-                auth: {
-                    id: 'ENABLE',
-                    name:'启用'
-                },
-                createdAt:'s',
-                loginTime:'d',
-                status:'启用'
-            }]
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_LINKS_LIST, CommonAction.REQUEST_FAILURE + 'LINKS' ],
+            endpoint: LinksApi.getList,
+            options: { body: query, method:'GET' }
         }
     }
 }
-export function createMsg(query) {
+export function createLinks(query) {
     return {
-        /* [CALL_API]: {
-         types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_LINKS, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
-         endpoint: BookApi.getList,
-         options: { body: query, method:'GET' }
-         } */
-        type: 'RECEIVE_UPDATE_LINKS',
-        response: {
-            code: 0,
-            mag: ''
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_LINKS, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            endpoint: LinksApi.create,
+            options: { body: query, method:'POST' }
         }
     }
 }
-export function updateMsg(query) {
+export function updateLinks(query) {
     return {
-        /* [CALL_API]: {
-         types: [ CommonAction.REQUEST_START, RECEIVE_CREATE_LINKS, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
-         endpoint: BookApi.getList,
-         options: { body: query, method:'GET' }
-         } */
-        type: 'RECEIVE_CREATE_LINKS',
-        response: {
-            code: 0,
-            mag: ''
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE_LINKS, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            endpoint: LinksApi.update,
+            options: { body: query, method:'POST' }
         }
     }
 }

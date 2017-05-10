@@ -7,7 +7,8 @@ import { Table, Popconfirm, Icon, Popover } from 'antd'
 import TableEditInput from '../../components/TableEditInput'
 import TableEditSelect from '../../components/TableEditSelect'
 import TableEditInputSearch from '../../components/TableEditInputSearch'
-
+import Auth from '../../utils/Auth'
+const permissionBtns = ['CREATE', 'DELETE', 'UPDATE', 'SELECT', 'REVIEW', 'SORT']
 export default class TableGrid extends React.Component {
     static propTypes = {
         columns: React.PropTypes.array.isRequired,
@@ -30,6 +31,11 @@ export default class TableGrid extends React.Component {
         this.initState(true, props.dataSource)
         this.editInputValidates = {}
         this.catchClearRowKeys = props.isClearRowKeys
+        const user = Auth.getAccount() || {}
+        this.permissionBtns = []
+        user.Auth.AuthOperation.map((item) => {
+            this.permissionBtns.push(item.type)
+        })
     }
     initState(init, data) {
         const columns = this.catchColumns
@@ -132,12 +138,14 @@ export default class TableGrid extends React.Component {
             if (Object.keys(attr).length > 0) {
                 if (!attr.show) return false
             }
-            if (btn.type === 'link') {
-                doms.push(this._renderOperationLink(btn, data, index, key, text))
-            } else if (btn.type === 'edit') {
-                doms.push(this._renderOperationEdit(btn, data, index, key, text))
-            } else if (btn.type === 'popConfirm') {
-                doms.push(this._renderOperationPopConfirm(btn, data, index, key, text))
+            if (typeof btn.authority === 'undefined' || this.permissionBtns.indexOf(btn.authority) > -1) {
+                if (btn.type === 'link') {
+                    doms.push(this._renderOperationLink(btn, data, index, key, text))
+                } else if (btn.type === 'edit') {
+                    doms.push(this._renderOperationEdit(btn, data, index, key, text))
+                } else if (btn.type === 'popConfirm') {
+                    doms.push(this._renderOperationPopConfirm(btn, data, index, key, text))
+                }
             }
         })
         return doms

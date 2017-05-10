@@ -3,11 +3,13 @@ import { Button, message } from 'antd'
 import moment from 'moment'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import BtnPermission from '../../../../components/BtnPermission'
+import { CommonStatus, BtnOperation } from '../../../../constants/Status'
 export default class NewsList extends React.Component {
     static propTypes = {
         NewsList: React.PropTypes.object,
         getList: React.PropTypes.func,
+        getCategorys: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -15,6 +17,7 @@ export default class NewsList extends React.Component {
     }
     state = {
         news: [],
+        category: [],
         isClearRowKeys:false
     }
     constructor(props) {
@@ -40,17 +43,22 @@ export default class NewsList extends React.Component {
         this.getNews()
     }
     componentWillMount() {
+        this.props.getCategorys()
         this.getNews()
     }
     componentWillReceiveProps(nextProps) {
         if (nextProps.NewsList.news) {
             this.pageTotalElement = nextProps.NewsList.news.totalElement
-            const contenet = nextProps.NewsList.news
+            const contenet = nextProps.NewsList.news.content
             contenet.map((item) => {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
-                item.statusName = QuotePlanStatus[item.status]
+                item.statusName = CommonStatus[item.status]
             })
             this.setState({ news: contenet, isClearRowKeys:false })
+            this.props.clearState()
+        }
+        if (nextProps.NewsList.category) {
+            this.setState({ category:nextProps.NewsList.category.content })
             this.props.clearState()
         }
         if (nextProps.NewsList.error) {
@@ -80,7 +88,7 @@ export default class NewsList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.convertStatus(QuotePlanStatus),
+                    options:this.state.category,
                     onChange:(val) => {}
                 },
                 fieldLabel:'分类',
@@ -99,7 +107,7 @@ export default class NewsList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.convertStatus(QuotePlanStatus),
+                    options:this.convertStatus(CommonStatus),
                     onChange:(val) => {}
                 },
                 fieldLabel:'状态',
@@ -120,7 +128,7 @@ export default class NewsList extends React.Component {
             },
             {
                 title: '分类', // 标题
-                dataIndex: 'category.name' // 字段名称
+                dataIndex: 'Category.name' // 字段名称
             },
             {
                 title: '作者', // 标题
@@ -138,10 +146,10 @@ export default class NewsList extends React.Component {
                 title: '访问数', // 标题
                 dataIndex: 'accessCount' // 字段名称
             },
-            {
+            /* {
                 title: '置顶标记', // 标题
                 dataIndex: 'isTop' // 字段名称
-            },
+            }, */
             {
                 title: '状态', // 标题
                 dataIndex: 'statusName' // 字段名称
@@ -157,6 +165,7 @@ export default class NewsList extends React.Component {
                 btns:[
                     {
                         type:'link',
+                        authority:BtnOperation.编辑,
                         text:'编辑',
                         status:{
                             field:'status',
@@ -184,7 +193,9 @@ export default class NewsList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/newsEdit')}>新闻添加</Button>
+                    <BtnPermission type={BtnOperation.添加}>
+                        <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/newsEdit')}>新闻添加</Button>
+                    </BtnPermission>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

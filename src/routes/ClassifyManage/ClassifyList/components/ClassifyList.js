@@ -1,9 +1,10 @@
 import React from 'react'
 import { Button, message } from 'antd'
 import moment from 'moment'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import { CommonStatus, BtnOperation } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
+import BtnPermission from '../../../../components/BtnPermission'
 
 export default class ClassifyList extends React.Component {
     static propTypes = {
@@ -37,11 +38,13 @@ export default class ClassifyList extends React.Component {
         this.getClassifys()
     }
     componentWillReceiveProps(nextProps) {
-        if (nextProps.ClassifyList.classifyList) {
-            this.pageTotalElement = nextProps.ClassifyList.classifyList.totalElement
-            const classifyList = nextProps.ClassifyList.classifyList
+        if (nextProps.ClassifyList.list) {
+            this.pageTotalElement = nextProps.ClassifyList.list.totalElement
+            const classifyList = nextProps.ClassifyList.list.content
             classifyList.map((item) => {
-                item.statusName = QuotePlanStatus[item.status]
+                item.isNav = item.is_nav ? '是' : '否'
+                item.statusName = CommonStatus[item.status]
+                item.parent = classifyList.find((f) => f.id === item.parent_id)
             })
             this.setState({ classifyList: classifyList })
             this.props.clearState()
@@ -74,7 +77,7 @@ export default class ClassifyList extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.translateStatus(QuotePlanStatus),
+                    options:this.translateStatus(CommonStatus),
                     // selected:plan.departureHarbor ? plan.departureHarbor.id : '',
                     onChange:(val) => {}
                 },
@@ -93,7 +96,7 @@ export default class ClassifyList extends React.Component {
             },
             {
                 title: '状态', // 标题
-                dataIndex: 'stauts' // 字段名称
+                dataIndex: 'statusName' // 字段名称
             },
             {
                 title: '导航标记', // 标题
@@ -110,6 +113,7 @@ export default class ClassifyList extends React.Component {
                 btns:[
                     {
                         type:'link',
+                        authority:BtnOperation.编辑,
                         text:'编辑',
                         status:{
                             field:'status',
@@ -137,7 +141,9 @@ export default class ClassifyList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/authorityEdit')}>添加分类</Button>
+                    <BtnPermission type={BtnOperation.添加}>
+                        <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/classifyEdit')}>添加分类</Button>
+                    </BtnPermission>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

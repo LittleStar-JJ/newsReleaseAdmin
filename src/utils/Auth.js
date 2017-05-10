@@ -33,9 +33,17 @@ class Auth {
 
     login(account) {
         if (account && account.authToken) {
-            let now = new Date()
+            /* let now = new Date()
             let expireTime = account.expireTime && Number.isSafeInteger(account.expireTime) ? Number(account.expireTime) : 0
-            account.expireTime = now.setTime(now.getTime() + expireTime)
+            account.expireTime = now.setTime(now.getTime() + expireTime) */
+            try {
+                account.Auth.AuthMenu.map((item) => {
+                    delete item.authMenu
+                })
+                account.Auth.AuthOperation.map((item) => {
+                    delete item.authOperation
+                })
+            } catch (e) {}
             this.storeAccount(account)
         }
     }
@@ -46,8 +54,8 @@ class Auth {
             localStorage.setItem(this.authTokenKey, Encrypt.encrypt(accountJsonString, this.secretKey))
             sessionStorage.setItem(this.authTokenKey, Encrypt.encrypt(accountJsonString, this.secretKey))
         } else {
-            localStorage.removeItem(this.authTokenKey)
-            sessionStorage.removeItem(this.authTokenKey)
+            window.localStorage.removeItem(this.authTokenKey)
+            window.sessionStorage.removeItem(this.authTokenKey)
         }
     }
 

@@ -3,7 +3,8 @@ import { CommonAction } from '../../../../constants/ActionTypes'
 
 const CLEAR_NEWS = 'CLEAR_NEWS'
 const RECEIVE_NEWS_LIST = 'RECEIVE_NEWS_LIST'
-import { BookApi } from '../../../../constants/Api'
+const RECEIVE_CATEGORY_LIST = 'RECEIVE_CATEGORY_LIST'
+import { NewsApi, CategoryApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
@@ -12,28 +13,19 @@ export function clearState() {
 }
 export function getList(query) {
     return {
-        /* [CALL_API]: {
+        [CALL_API]: {
             types: [ CommonAction.REQUEST_START, RECEIVE_NEWS_LIST, CommonAction.REQUEST_FAILURE + 'USER' ],
-            endpoint: BookApi.getList,
+            endpoint: NewsApi.getList,
             options: { body: query, method:'GET' }
-        } */
-        type: 'RECEIVE_NEWS_LIST',
-        response: {
-            data: [{
-                id:1,
-                title:1,
-                author:2,
-                category:{
-                    id: 1,
-                    name:'男'
-                },
-                createdAt:12222222222222,
-                source:12222222222222,
-                keyWords:1,
-                accessCount:1,
-                isTop:1,
-                status:'ENABLE'
-            }]
+        }
+    }
+}
+export function getCategorys(query) {
+    return {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_CATEGORY_LIST, CommonAction.REQUEST_FAILURE + 'USER' ],
+            endpoint: CategoryApi.getList,
+            options: { body: query, method:'GET' }
         }
     }
 }
@@ -41,6 +33,7 @@ export function getList(query) {
 const initialState = {
     fetching:false,
     news:null,
+    category:null,
     error:null
 }
 const ACTION_HANDLERS = {
@@ -49,6 +42,9 @@ const ACTION_HANDLERS = {
     },
     [RECEIVE_NEWS_LIST] : (state, action) => {
         return ({ ...state, fetching: false, news: action.response.data, error: null })
+    },
+    [RECEIVE_CATEGORY_LIST] : (state, action) => {
+        return ({ ...state, fetching: false, category: action.response.data, error: null })
     },
     [CLEAR_NEWS] : () => {
         return ({ ...initialState })

@@ -1,13 +1,14 @@
 import { connect } from 'react-redux'
-import { clearState, getAdminList, createMsg, updateMsg } from '../modules/adminList'
+import { clearState, getAdminList, createAdmin, updateAdmin, getAuthList } from '../modules/adminList'
 
 import AdminList from '../components/AdminList'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
     getAdminList: (query) => getAdminList(query),
-    createMsg: (query) => createMsg(query),
-    updateMsg: (query) => updateMsg(query)
+    createAdmin: (query) => createAdmin(query),
+    updateAdmin: (query) => updateAdmin(query),
+    getAuthList: (query) => getAuthList(query)
 }
 
 const mapStateToProps = (state) => ({

@@ -1,10 +1,11 @@
 import { connect } from 'react-redux'
-import { clearState, getUesrById, createUser, updateUser } from '../modules/commentEdit'
+import { clearState, getCommentById, commentReview } from '../modules/commentEdit'
 import CommentEdit from '../components/CommentEdit'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
-    getCommentById: (id) => getCommentById(id)
+    getCommentById: (id) => getCommentById(id),
+    commentReview: (id) => commentReview(id)
 }
 
 const mapStateToProps = (state) => ({
