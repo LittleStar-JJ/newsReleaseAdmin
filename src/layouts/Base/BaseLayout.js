@@ -16,7 +16,8 @@ export default class BaseLayout extends React.Component {
      */
     recursiveMenu = (menus) => {
         const firstMenu = menus.filter((item) => item.parent_id === 0)
-        firstMenu.map((item) => {
+        firstMenu.map((item, i) => {
+            item.key = `${i}`
             this.setMenusData(item.id, item, menus)
         })
         return firstMenu
@@ -27,7 +28,7 @@ export default class BaseLayout extends React.Component {
         })
         if (find.length) {
             find.map((f) => {
-                f.key = `${id}-${f.id}`
+                f.key = `${firstMenu.key}-${f.id}`
                 firstMenu.child = find
                 this.setMenusData(f.id, f, menus)
             })
