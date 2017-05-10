@@ -33,7 +33,8 @@ export default class TableGrid extends React.Component {
         this.catchClearRowKeys = props.isClearRowKeys
         const user = Auth.getAccount() || {}
         this.permissionBtns = []
-        user.Auth.AuthOperation.map((item) => {
+        const operations = (user.Auth || {}).AuthOperation || []
+        operations.map((item) => {
             this.permissionBtns.push(item.type)
         })
     }

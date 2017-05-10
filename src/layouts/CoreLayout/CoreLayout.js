@@ -160,7 +160,7 @@ export class CoreLayout extends BaseLayout {
     }
     render() {
         const user = Auth.getAccount() || {}
-        const menuData = this.recursiveMenu(user.Auth.AuthMenu)
+        const menuData = this.recursiveMenu((user.Auth || {}).AuthMenu || [])
         // let meuns = lMeuns
         const DropdownMenu = (
             <Menu>

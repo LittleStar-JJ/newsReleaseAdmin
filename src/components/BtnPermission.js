@@ -13,8 +13,9 @@ export default class BtnPermission extends React.Component {
     constructor(props) {
         super(props)
         const user = Auth.getAccount() || {}
+        const operations = (user.Auth || {}).AuthOperation || []
         this.permissionBtns = []
-        user.Auth.AuthOperation.map((item) => {
+        operations.map((item) => {
             this.permissionBtns.push(item.type)
         })
     }

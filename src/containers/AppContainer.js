@@ -43,7 +43,12 @@ class AppContainer extends Component {
 }
 
 function requireLogin(nextState, replace) {
-    if (nextState.location.pathname !== '/') {
+    if (!Auth.isLogin()) {
+        replace({
+            pathname: '/login',
+            state: { preState:nextState.location.state, nextPathname: nextState.location.pathname, query:nextState.location.query }
+        })
+    } else if (nextState.location.pathname !== '/') {
         const meuns = (Auth.getAccount() || {}).Auth.AuthMenu || []
         let authRouter = false
         let match = nextState.location.pathname.match(reg)
