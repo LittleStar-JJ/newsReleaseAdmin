@@ -68,7 +68,7 @@ class AuthorityEdit extends React.Component {
             firstMenu.map((item, i) => {
                 this.setMenusData(item.id, item, menus)
             })
-            this.setState({ menus:firstMenu })
+            this.setState({ menus:firstMenu, menusCheckedKeys:[] })
             console.log('ss', firstMenu)
             this.props.clearState()
         }
