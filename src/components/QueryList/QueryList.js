@@ -348,6 +348,11 @@ class QueryForm extends React.Component {
                                     fieldsValue['htmlUpdate'] = true
                                 }
                                 break
+                            case 'file':
+                                if (item.uploadProps.fileList !== item2.uploadProps.fileList) {
+                                    fieldsValue[item2.fieldName] = item2.uploadProps.fileList
+                                }
+                                break
                         }
                     }
                 })
@@ -690,8 +695,12 @@ class QueryForm extends React.Component {
                     <CheckboxGroup options={options} disabled={item.disabled} size="large" style={item.option.style} onChange={(val) => this.handleSelectChange(item.option, val)} />
                 )
             case 'file':
+                const valuePropName = {}
+                if (!item.uploadProps.key) {
+                    valuePropName['valuePropName'] = 'fileList'
+                }
                 return getFieldDecorator(item.fieldName, {
-                    valuePropName: 'fileList',
+                    ...valuePropName,
                     getValueFromEvent: this.normFile,
                     ...rules
                 })(

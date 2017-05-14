@@ -16,6 +16,12 @@
     if (!window.Promise) {
         window.Promise = Promise;
     }
+    window.ApiHost = '<%= htmlWebpackPlugin.options.apiHost %>'
 </script>
+<!-- 配置文件 -->
+<script type="text/javascript" src="/ueditor-utf-8/ueditor.config.js"></script>
+<!-- 编辑器源码文件 -->
+<script type="text/javascript" src="/ueditor-utf-8/ueditor.all.js"></script>
+<script type="text/javascript" charset="utf-8" src="/ueditor-utf-8/lang/zh-cn/zh-cn.js"></script>
 </body>
 </html>

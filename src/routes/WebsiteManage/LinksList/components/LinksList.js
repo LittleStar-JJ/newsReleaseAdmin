@@ -6,6 +6,8 @@ import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
 import ResponseCode from '../../../../utils/ResponseCode'
+import { LinksApi } from '../../../../constants/Api'
+const config = require('../../../../../config/config.json')[NODE_ENV.toUpperCase()]
 
 export default class LinksList extends React.Component {
     static propTypes = {
@@ -136,7 +138,16 @@ export default class LinksList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => {
-                            this.setState({ modalVisible:true, LinksOne: links[index], newRandomKeys:Math.random() })
+                            const _c = links[index]
+                            _c.icon = _c.icon || ''
+                            const icon = _c.icon.substr(_c.icon.lastIndexOf('/') + 1, _c.icon.length)
+                            const fileList = [{
+                                uid:icon + Math.random(),
+                                name: icon,
+                                status: 'done',
+                                url:_c.icon
+                            }]
+                            this.setState({ newRandomKeys:Math.random(), modalVisible:true, LinksOne: _c, fileList })
                         }
                     }
                 ]
@@ -174,12 +185,12 @@ export default class LinksList extends React.Component {
                 type:'file',
                 fieldLabel:'图标',
                 uploadProps:{
+                    key:this.state.newRandomKeys,
                     name: 'file',
-                    multiple:true,
                     accept:'.jpg,.jpeg,.gif,.png,.bmp',
-                    action: '',
+                    action: LinksApi.upload,
                     data:{ authToken:this.authToken },
-                    fileList:this.state.fileList,
+                    fileList:Object.assign([], [], this.state.fileList),
                     listType:'picture',
                     onRemove:(file) => {
                         this.state.fileList.map((item, i) => {
@@ -194,19 +205,12 @@ export default class LinksList extends React.Component {
                         if (info.file.status === 'done') {
                             if (info.file.response.code === ResponseCode.SUCCESS) {
                                 const fileData = info.file.response.data
-                                let _otherFiles = []
-                                this.state.fileList.forEach((item, i) => {
-                                    if (item.name !== info.file.name) {
-                                        _otherFiles.push(item)
-                                    }
-                                })
-                                _otherFiles.push({
+                                let _otherFiles = [{
                                     uid: fileData.id,
                                     name: info.file.name,
                                     status: 'done',
-                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
-                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
-                                })
+                                    url:`${config.apiHost}/${fileData.path}`
+                                }]
                                 message.success(`${info.file.name} 上传成功`)
                                 this.setState({ fileList:_otherFiles })
                                 return false
@@ -217,11 +221,10 @@ export default class LinksList extends React.Component {
                         } else if (info.file.status === 'error') {
                             message.error(`${info.file.name} 上传失败.`)
                         }
-                        this.state.fileList.push(info.file)
-                        this.setState({ fileList:this.state.fileList })
+                        this.setState({ fileList:[info.file] })
                     }
                 },
-                fieldName:'file',
+                fieldName:'icon',
                 onChange:() => {}
             }
         ]
@@ -239,10 +242,13 @@ export default class LinksList extends React.Component {
                 this.getLinks()
             }
         }
+        console.log('s',this.state.newRandomKeys)
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => { this.setState({ modalVisible:true, newRandomKeys:Math.random() }) }}>友情链接创建</Button>
+                    <Button className="page-top-btns" type="primary" onClick={() => {
+                        this.setState({ newRandomKeys:Math.random(), modalVisible:true, LinksOne:null, fileList:[] })
+                    }}>友情链接创建</Button>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
@@ -250,7 +256,7 @@ export default class LinksList extends React.Component {
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={links} pagination={pagination} />
                 </div>
-                <Modal key={this.state.newRandomKeys} title="友情链接编辑" visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
+                <Modal title="友情链接编辑" key={this.state.newRandomKeys} visible={this.state.modalVisible} width="40%" onCancel={() => { this.setState({ modalVisible:false }) }}
                   footer={[<Button key="back" type="ghost" size="large" onClick={(e) => this.save(e)}>确认</Button>]} >
                     <OBOREdit ref="OBOREdit1" colSpan={24} options={modalOption} />
                 </Modal>
@@ -259,7 +265,8 @@ export default class LinksList extends React.Component {
     }
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value1) => {
-            value1.icon = '' // this.state.fileList
+            const icon = this.state.fileList.map((item) => item.url)
+            value1.icon = icon.join(',')
             if (this.state.LinksOne) {
                 value1.id = this.state.LinksOne.id
                 this.props.updateLinks(value1)

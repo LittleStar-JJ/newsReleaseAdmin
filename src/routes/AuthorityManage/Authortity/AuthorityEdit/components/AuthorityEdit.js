@@ -131,7 +131,7 @@ class AuthorityEdit extends React.Component {
                 type:'text',
                 rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'角色名称',
-                disabled:this.state.disabled,
+                disabled:this.id === '1' || false,
                 fieldName:'name',
                 placeholder:'请输入',
                 initialValue:detail.name,
@@ -146,6 +146,7 @@ class AuthorityEdit extends React.Component {
                     options: [{ id:'ENABLED', name:'启用' }, { id:'DISABLED', name:'禁用' }], // 下拉框option数据 (array)
                     selected: detail.status || 'ENABLED' // 选中数据（value[string]）
                 },
+                disabled:this.id === '1' || false,
                 fieldLabel:'状态', // 显示label
                 fieldName:'status' // 绑定的字段
             },
@@ -160,7 +161,7 @@ class AuthorityEdit extends React.Component {
                     selected:this.state.selectedOperations,
                     onChange:(val) => {}
                 },
-                disabled:false,
+                disabled:this.id === '1' || false,
                 fieldLabel:'可操作组',
                 fieldName:'operationGroup'
             }
@@ -168,7 +169,11 @@ class AuthorityEdit extends React.Component {
         return (
             <div className="page-container page-detail">
                 <div className="page-top-btns">
-                    <Button type="primary" onClick={(e) => { this.save(e) }}>保存</Button>
+                    {
+                        this.id !== '1' ?
+                            <Button type="primary" onClick={(e) => { this.save(e) }}>保存</Button> :
+                            ''
+                    }
                 </div>
                 <div style={{ width: '50%' }}>
                     <OBOREdit options={options} colSpan={24} ref="OBOREdit1" />
@@ -194,12 +199,12 @@ class AuthorityEdit extends React.Component {
         return menus.map((item) => {
             if (item.child) {
                 return (
-                    <TreeNode title={item.name} key={item.id} >
+                    <TreeNode title={item.name} key={item.id} disabled={this.id === '1' || false}>
                         {this._renderTreeNode(item.child)}
                     </TreeNode>
                 )
             } else {
-                return <TreeNode title={item.name} key={item.id} />
+                return <TreeNode title={item.name} key={item.id} disabled={this.id === '1' || false} />
             }
         })
     }
@@ -208,7 +213,6 @@ class AuthorityEdit extends React.Component {
             value.operation_ids = value.operationGroup.join(',')
             value.menu_ids = this.state.menusCheckedKeys.join(',')
             delete value.operationGroup
-            console.log('aaaaaa', value)
             if (!this.id) {
                 this.props.createAuth(value)
             } else {

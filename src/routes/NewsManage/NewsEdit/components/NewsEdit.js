@@ -2,8 +2,12 @@ import React from 'react'
 import moment from 'moment'
 import { Button, Popconfirm, message, Form, Row, Col } from 'antd'
 import OBOREdit from '../../../../components/OBOREdit'
+import UEditor from '../../../../components/UEditor'
 import { CommonStatus } from '../../../../constants/Status'
 import ResponseCode from '../../../../utils/ResponseCode'
+import auth from '../../../../utils/Auth'
+import { NewsApi } from '../../../../constants/Api'
+const config = require('../../../../../config/config.json')[NODE_ENV.toUpperCase()]
 
 class NewsEdit extends React.Component {
     static propTypes = {
@@ -22,6 +26,9 @@ class NewsEdit extends React.Component {
     constructor(props) {
         super(props)
         const { params: { id } } = props
+        const session = auth.getAccount()
+        let { authToken = undefined } = session
+        this.authToken = authToken
         this.id = id
     }
     state = {
@@ -47,7 +54,34 @@ class NewsEdit extends React.Component {
         }
         if (nextProps.NewsEdit.newsDetail) {
             const newsDetail = nextProps.NewsEdit.newsDetail
-            this.setState({ newsDetail: newsDetail })
+            const thumbnailPic = []
+            const carouselPic = []
+            newsDetail.thumbnailPic = (newsDetail.thumbnailPic || '')
+            newsDetail.carouselPic = (newsDetail.carouselPic || '')
+            const thumbnailPicName = newsDetail.thumbnailPic.substr(newsDetail.thumbnailPic.lastIndexOf('/') + 1, newsDetail.thumbnailPic.length)
+            const carouselPicName = newsDetail.carouselPic.substr(newsDetail.carouselPic.lastIndexOf('/') + 1, newsDetail.carouselPic.length)
+            if (newsDetail.thumbnailPic) {
+                thumbnailPic.push({
+                    uid:thumbnailPicName || 1,
+                    name: thumbnailPicName,
+                    status: 'done',
+                    url:newsDetail.thumbnailPic
+                })
+            }
+            if (newsDetail.carouselPic) {
+                carouselPic.push({
+                    uid:carouselPicName || 1,
+                    name: carouselPicName,
+                    status: 'done',
+                    url:newsDetail.carouselPic
+                })
+            }
+            this.refs.UEditor1.setContent(newsDetail.content || '')
+            this.setState({
+                newsDetail: newsDetail,
+                thumbnailPicFileList:thumbnailPic,
+                carouselPicFileList:carouselPic
+            })
             this.props.clearState()
         }
         if (nextProps.NewsEdit.create) {
@@ -121,7 +155,7 @@ class NewsEdit extends React.Component {
                 fieldLabel:'分类',
                 fieldName:'category_id'
             },
-            {
+            /* {
                 type:'editor',
                 rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'内容',
@@ -130,7 +164,7 @@ class NewsEdit extends React.Component {
                 placeholder:'请输入',
                 initialValue:newsDetail.content,
                 onChange:() => {}
-            },
+            }, */
             {
                 type:'text',
                 fieldLabel:'作者',
@@ -180,40 +214,32 @@ class NewsEdit extends React.Component {
                 fieldLabel:'缩略图',
                 uploadProps:{
                     name: 'file',
-                    multiple:true,
                     accept:'.jpg,.jpeg,.gif,.png,.bmp',
-                    action: '',
+                    action: NewsApi.upload,
                     data:{ authToken:this.authToken },
                     fileList:this.state.thumbnailPicFileList,
                     listType:'picture',
                     onRemove:(file) => {
-                        this.state.fileList.map((item, i) => {
+                        this.state.thumbnailPicFileList.map((item, i) => {
                             if (item.uid === file.uid) {
                                 this.state.thumbnailPicFileList.splice(i, 1)
                             }
                         })
-                        this.setState({ fileList:this.state.fileList })
+                        this.setState({ thumbnailPicFileList:this.state.thumbnailPicFileList })
                         return true
                     },
                     onChange: (info) => {
                         if (info.file.status === 'done') {
                             if (info.file.response.code === ResponseCode.SUCCESS) {
                                 const fileData = info.file.response.data
-                                let _otherFiles = []
-                                this.state.fileList.forEach((item, i) => {
-                                    if (item.name !== info.file.name) {
-                                        _otherFiles.push(item)
-                                    }
-                                })
-                                _otherFiles.push({
+                                let _otherFiles = [{
                                     uid: fileData.id,
                                     name: info.file.name,
                                     status: 'done',
-                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
-                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
-                                })
+                                    url:`${config.apiHost}/${fileData.path}`
+                                }]
                                 message.success(`${info.file.name} 上传成功`)
-                                this.setState({ fileList:_otherFiles })
+                                this.setState({ thumbnailPicFileList:_otherFiles })
                                 return false
                             } else {
                                 if (info.file.response.code === ResponseCode.AUTH_EXPIRED) this.context.router.replace('/login')
@@ -222,8 +248,8 @@ class NewsEdit extends React.Component {
                         } else if (info.file.status === 'error') {
                             message.error(`${info.file.name} 上传失败.`)
                         }
-                        this.state.fileList.push(info.file)
-                        this.setState({ fileList:this.state.fileList })
+                        this.state.thumbnailPicFileList.push(info.file)
+                        this.setState({ thumbnailPicFileList:this.state.thumbnailPicFileList })
                     }
                 },
                 fieldName:'thumbnailPic',
@@ -234,9 +260,8 @@ class NewsEdit extends React.Component {
                 fieldLabel:'轮播图',
                 uploadProps:{
                     name: 'file',
-                    multiple:true,
                     accept:'.jpg,.jpeg,.gif,.png,.bmp',
-                    action: '',
+                    action: NewsApi.upload,
                     data:{ authToken:this.authToken },
                     fileList:this.state.carouselPicFileList,
                     listType:'picture',
@@ -246,7 +271,7 @@ class NewsEdit extends React.Component {
                                 this.state.carouselPicFileList.splice(i, 1)
                             }
                         })
-                        this.setState({ fileList:this.state.fileList })
+                        this.setState({ carouselPicFileList:this.state.carouselPicFileList })
                         return true
                     },
                     onChange: (info) => {
@@ -254,20 +279,15 @@ class NewsEdit extends React.Component {
                             if (info.file.response.code === ResponseCode.SUCCESS) {
                                 const fileData = info.file.response.data
                                 let _otherFiles = []
-                                this.state.fileList.forEach((item, i) => {
-                                    if (item.name !== info.file.name) {
-                                        _otherFiles.push(item)
-                                    }
-                                })
                                 _otherFiles.push({
                                     uid: fileData.id,
                                     name: info.file.name,
                                     status: 'done',
-                                    url:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`,
-                                    thumbUrl:`${consts.apiHost}/consignor/business_license/${fileData.id}?authToken=${this.authToken}`
+                                    url:`${config.apiHost}/${fileData.path}`,
+                                    thumbUrl:`${config.apiHost}/${fileData.path}`
                                 })
                                 message.success(`${info.file.name} 上传成功`)
-                                this.setState({ fileList:_otherFiles })
+                                this.setState({ carouselPicFileList:_otherFiles })
                                 return false
                             } else {
                                 if (info.file.response.code === ResponseCode.AUTH_EXPIRED) this.context.router.replace('/login')
@@ -276,8 +296,8 @@ class NewsEdit extends React.Component {
                         } else if (info.file.status === 'error') {
                             message.error(`${info.file.name} 上传失败.`)
                         }
-                        this.state.fileList.push(info.file)
-                        this.setState({ fileList:this.state.fileList })
+                        this.state.carouselPicFileList.push(info.file)
+                        this.setState({ carouselPicFileList:this.state.carouselPicFileList })
                     }
                 },
                 fieldName:'carouselPic',
@@ -306,15 +326,25 @@ class NewsEdit extends React.Component {
                 <div style={{ width: '50%' }}>
                     <OBOREdit options={options} colSpan={24} ref="OBOREdit1" />
                 </div>
+                <Row>
+                    <Col style={{ marginLeft:'10.5%' }} span={1} ><span style={{ color:'red' }}>*</span>内容：</Col>
+                    <Col span={18}>
+                        <div style={{ marginTop:'-10px' }}>
+                            <UEditor html={newsDetail.content} ref="UEditor1" />
+                        </div>
+                    </Col>
+                </Row>
             </div>
         )
     }
 
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value) => {
-            console.log('aaaaaa', value)
-            value.thumbnailPic = 'test' // this.state.thumbnailPicFileList
-            value.carouselPic = '' // this.state.carouselPicFileList
+            const thumbnailPic = this.state.thumbnailPicFileList.map((item) => item.url)
+            const carouselPic = this.state.carouselPicFileList.map((item) => item.url)
+            value.thumbnailPic = thumbnailPic.join(',')
+            value.carouselPic = carouselPic.join(',')
+            value.content = this.refs.UEditor1.getContent()
             if (!this.id) {
                 this.props.createNews(value)
             } else {
