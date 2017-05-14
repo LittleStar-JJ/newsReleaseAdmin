@@ -242,7 +242,6 @@ export default class LinksList extends React.Component {
                 this.getLinks()
             }
         }
-        console.log('s',this.state.newRandomKeys)
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
