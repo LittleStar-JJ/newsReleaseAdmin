@@ -23,6 +23,7 @@ export default class UEditor extends React.Component {
         }
         setTimeout(() => {
             this.ue = window.UE.getEditor('editor-content', {
+                // 配置显示功能按钮
                 toolbars:[
                     [
                         'anchor', // 锚点
@@ -114,15 +115,22 @@ export default class UEditor extends React.Component {
             })
         }, waiting)
     }
+    // 获取内容
     getContent = () => {
         return this.ue.getContent()
     }
+    /**
+     * 设置内容
+     * @param html 内容
+     */
     setContent = (html) => {
+        // 设置等待组件初始化完成
         setTimeout(() => {
             return this.ue.setContent(html)
         }, 1000)
     }
     componentWillUnmount() {
+        // 卸载组件
         this.ue.destroy()
         this.ue = null
     }
