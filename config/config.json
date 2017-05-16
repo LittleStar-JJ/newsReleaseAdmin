@@ -3,13 +3,13 @@
     "cdnHost"               : "http://localhost",
     "apiHost"               : "http://139.129.21.97:3000",
     "port"                  : 3001,
-    "compiler_public_path"  : "http://localhost:3001/"
+    "compiler_public_path"  : "http://139.129.21.97:3001/"
   },
 
   "PRODUCTION" : {
-    "cdnHost"     : "http://consignor.test.oborexpress.com",
-    "apiHost"     : "http://api.test.oborexpress.com",
-    "port"        : "",
+    "cdnHost"     : "http://139.129.21.97",
+    "apiHost"     : "http://139.129.21.97:3000",
+    "port"        : 3001,
     "compiler_public_path"  : "http://consignor.test.oborexpress.com/",
     "compiler_fail_on_warning"  : false,
     "compiler_hash_type"        : "chunkhash",
