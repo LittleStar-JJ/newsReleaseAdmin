@@ -41,10 +41,10 @@ export default class AdminList extends React.Component {
     handleSearch = (value) => {
         let _data1 = []
         if (value.createdAt) {
-            value.createdTime.forEach((data) => {
+            value.createdAt.forEach((data) => {
                 _data1.push(data.format('x'))
             })
-            value.createdTime = _data1.join('-')
+            value.createdAt = _data1.join('-')
         }
         this.pageNum = 1
         this.query = value
@@ -208,7 +208,7 @@ export default class AdminList extends React.Component {
             {
                 type:'text',
                 fieldLabel:'密码',
-                fieldName:'password',
+                fieldName:'new_password',
                 initialValue:'',
                 onChange:() => {}
             },
@@ -244,7 +244,7 @@ export default class AdminList extends React.Component {
             modalOption.splice(2, 0, {
                 type:'text',
                 fieldLabel:'新密码',
-                fieldName:'new_password',
+                fieldName:'password',
                 initialValue:'',
                 onChange:() => {}
             })

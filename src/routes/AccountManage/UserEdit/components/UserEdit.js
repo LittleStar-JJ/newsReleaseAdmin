@@ -202,10 +202,10 @@ class UesrEdit extends React.Component {
             value.birthday = value.birthday.format('x')
             console.log('aaaaaa', value)
             if (!this.id) {
-                this.props.createUser({ freightBill:JSON.stringify(book) })
+                this.props.createUser({ freightBill:JSON.stringify(value) })
             } else {
-                book.id = this.id
-                this.props.updateUser({ freightBill:JSON.stringify(book) })
+                value.id = this.id
+                this.props.updateUser({ freightBill:JSON.stringify(value) })
             }
         })
     }
