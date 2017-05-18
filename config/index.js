@@ -22,6 +22,7 @@ const config = {
     // Server Configuration
     // ----------------------------------
     server_host : dev.cdnHost,
+    api_host : dev.apiHost,
     server_port : dev.port || 3000,
 
     // ----------------------------------

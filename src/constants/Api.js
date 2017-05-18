@@ -50,7 +50,8 @@ export const NewsApi = {
     getList: baseUrl + `news_admin/news/list`,
     getDetail: (id) => baseUrl + `news_admin/news/get/${id}`,
     update: baseUrl + `news_admin/news/update`,
-    create: baseUrl + `news_admin/news/create`
+    create: baseUrl + `news_admin/news/create`,
+    upload: baseUrl + `news_admin/news/upload`
 }
 
 export const CommentApi = {
@@ -64,7 +65,8 @@ export const LinksApi = {
     getList: baseUrl + `news_admin/links/list`,
     getDetail: (id) => baseUrl + `news_admin/links/get/${id}`,
     update: baseUrl + `news_admin/links/update`,
-    create: baseUrl + `news_admin/links/create`
+    create: baseUrl + `news_admin/links/create`,
+    upload: baseUrl + `news_admin/links/upload`
 }
 
 export const SiteApi = {

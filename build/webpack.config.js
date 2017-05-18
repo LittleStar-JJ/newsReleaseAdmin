@@ -42,6 +42,7 @@ webpackConfig.output = {
 webpackConfig.plugins = [
     new webpack.DefinePlugin(config.globals),
     new HtmlWebpackPlugin({ // 根据模板插入css/js等生成最终HTML
+        apiHost:config.api_host,
         template: paths.client(config.template_dir + '/index.html'), // 模板文件路径，支持加载器，比如 html!./index.html
         hash: false, //  如果为 true, 将添加一个唯一的 webpack 编译 hash 到所有包含的脚本和 CSS 文件，对于解除 cache 很有用
         favicon: paths.public('favicon.ico'), // 添加特定的 favicon 路径到输出的 HTML 文件中

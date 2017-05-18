@@ -116,7 +116,7 @@ export default class AuthorityList extends React.Component {
                     </div>
                 </div>
                 <div className="page-tabs-table">
-                    <TableGrid columns={gridColumns} dataSource={authorityList} pagination={pagination} />
+                    <TableGrid columns={gridColumns} dataSource={authorityList} />
                 </div>
             </div>
         )
