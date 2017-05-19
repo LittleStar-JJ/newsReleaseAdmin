@@ -13,7 +13,7 @@ export default class UEditor extends React.Component {
     }
     render() {
         return (
-            <div id="editor-content">&nbsp;</div>
+            <div id="editor-content" style={{ minHeight:'300px' }}>&nbsp;</div>
         )
     }
     componentDidMount() {
