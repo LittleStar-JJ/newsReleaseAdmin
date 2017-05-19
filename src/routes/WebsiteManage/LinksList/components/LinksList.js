@@ -206,7 +206,7 @@ export default class LinksList extends React.Component {
                     accept:'.jpg,.jpeg,.gif,.png,.bmp',
                     action: LinksApi.upload,
                     data:{ authToken:this.authToken },
-                    fileList:Object.assign([], [], this.state.fileList),
+                    fileList:this.state.fileList,
                     listType:'picture',
                     onRemove:(file) => {
                         this.state.fileList.map((item, i) => {

@@ -698,9 +698,9 @@ class QueryForm extends React.Component {
                 )
             case 'file':
                 const valuePropName = {}
-                if (!item.uploadProps.key) {
+                /* if (!item.uploadProps.key) {
                     valuePropName['valuePropName'] = 'fileList'
-                }
+                } */
                 return getFieldDecorator(item.fieldName, {
                     ...valuePropName,
                     getValueFromEvent: this.normFile,

@@ -248,8 +248,7 @@ class NewsEdit extends React.Component {
                         } else if (info.file.status === 'error') {
                             message.error(`${info.file.name} 上传失败.`)
                         }
-                        this.state.thumbnailPicFileList.push(info.file)
-                        this.setState({ thumbnailPicFileList:this.state.thumbnailPicFileList })
+                        this.setState({ thumbnailPicFileList:[info.file] })
                     }
                 },
                 fieldName:'thumbnailPic',
@@ -296,8 +295,7 @@ class NewsEdit extends React.Component {
                         } else if (info.file.status === 'error') {
                             message.error(`${info.file.name} 上传失败.`)
                         }
-                        this.state.carouselPicFileList.push(info.file)
-                        this.setState({ carouselPicFileList:this.state.carouselPicFileList })
+                        this.setState({ carouselPicFileList:[info.file] })
                     }
                 },
                 fieldName:'carouselPic',
