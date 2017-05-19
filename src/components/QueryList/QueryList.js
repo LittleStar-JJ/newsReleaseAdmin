@@ -98,11 +98,13 @@ class QueryForm extends React.Component {
                 Object.keys(rangePickeRepeatValue).forEach((key) => {
                     const _datas = rangePickeRepeatValue[key]
                     if (_datas && _datas.length) {
-                        if (_datas[0].format('x') === _datas[1].format('x')) {
-                            _datas[0].set({ hour:0, minute:0, second:0, millisecond:0 })
-                            // _datas[1].add(1, 'days')
-                            _datas[1].set({ hour:23, minute:59, second:59, millisecond:0 })
-                        }
+                        _datas[0].set({ hour:0, minute:0, second:0, millisecond:0 })
+                        _datas[1].set({ hour:23, minute:59, second:59, millisecond:0 })
+                        /* if (_datas[0].format('x') === _datas[1].format('x')) {
+                         _datas[0].set({ hour:0, minute:0, second:0, millisecond:0 })
+                         // _datas[1].add(1, 'days')
+                         _datas[1].set({ hour:23, minute:59, second:59, millisecond:0 })
+                         } */
                     }
                 })
                 /* this.inputSearchFields.forEach((item) => {

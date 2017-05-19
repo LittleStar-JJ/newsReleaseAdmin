@@ -10,6 +10,7 @@ export default class ClassifyList extends React.Component {
     static propTypes = {
         ClassifyList: React.PropTypes.object,
         getClassifyList: React.PropTypes.func,
+        deleteClassify: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -48,6 +49,11 @@ export default class ClassifyList extends React.Component {
             })
             this.setState({ classifyList: classifyList })
             this.props.clearState()
+        }
+        if (nextProps.ClassifyList.delete) {
+            this.props.clearState()
+            message.success('删除成功')
+            this.getClassifys()
         }
         if (nextProps.ClassifyList.error) {
             message.error(nextProps.ClassifyList.error.error)
@@ -91,6 +97,10 @@ export default class ClassifyList extends React.Component {
                 dataIndex: 'name' // 字段名称
             },
             {
+                title: '路由', // 标题
+                dataIndex: 'router' // 字段名称
+            },
+            {
                 title: '上级分类', // 标题
                 dataIndex: 'parent.name' // 字段名称
             },
@@ -120,6 +130,15 @@ export default class ClassifyList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => { this.context.router.push('/classifyEdit/' + classifyList[index].id) }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteClassify({ id:classifyList[index].id })
+                        }
                     }
                 ]
             }
@@ -147,7 +166,9 @@ export default class ClassifyList extends React.Component {
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>
+                    <br />
                 </div>
+                <br />
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={classifyList} pagination={pagination} />
                 </div>

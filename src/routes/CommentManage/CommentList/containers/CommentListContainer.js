@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
-import { clearState, getCommentList } from '../modules/commentList'
+import { clearState, getCommentList, deleteComment } from '../modules/commentList'
 
 import CommentList from '../components/CommentList'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
-    getCommentList: (query) => getCommentList(query)
+    getCommentList: (query) => getCommentList(query),
+    deleteComment: (query) => deleteComment(query)
 }
 
 const mapStateToProps = (state) => ({

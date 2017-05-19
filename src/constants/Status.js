@@ -10,8 +10,9 @@ export const QuotePlanStatus = {
     DISABLED : '禁用'
 }
 export const genderStatus = {
-    MALE: '男',
-    FEMALE: '女'
+    MAN: '男',
+    FEMALE: '女',
+    SECRECY: '保密'
 }
 // 操作项类型
 export const OperationType = {

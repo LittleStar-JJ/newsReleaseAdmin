@@ -1,52 +1,31 @@
 import { CALL_API } from '../../../../middleware/api'
 import { CommonAction } from '../../../../constants/ActionTypes'
 
-const CLEAR_BOOKEDIT = 'CLEAR_BOOKEDIT'
+const CLEAR_USER = 'CLEAR_USER'
 const RECEIVE_USER = 'RECEIVE_USER'
-const RECEIVE_CREATE = 'RECEIVE_CREATE'
-const RECEIVE_UPDATE = 'RECEIVE_UPDATE'
-import { BookApi } from '../../../../constants/Api'
+const RECEIVE_CREATE = 'RECEIVE_USER_CREATE'
+const RECEIVE_UPDATE = 'RECEIVE_USER_UPDATE'
+import { UserApi } from '../../../../constants/Api'
 
 export function clearState() {
     return {
-        type: CLEAR_BOOKEDIT
+        type: CLEAR_USER
     }
 }
 export function getUesrById(id) {
     return {
-        /* [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_USER, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
-            endpoint: BookApi.getUesrById(id),
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_USER, CommonAction.REQUEST_FAILURE + '_USER' ],
+            endpoint: UserApi.getDetail(id),
             options: { method:'GET' }
-        } */
-        type: 'RECEIVE_USER',
-        response: {
-            data: {
-                id:1,
-                nickName:1,
-                email:2,
-                qq:'qq',
-                integral:1,
-                introduction:'sssssss',
-                birthday: 121111,
-                password:'女',
-                address:12222222222222,
-                gender:{
-                    id: 'MALE',
-                    name:'男'
-                },
-                phone:1,
-                name:1,
-                status:'ENABLE'
-            }
         }
     }
 }
 export function createUser(p) {
     return {
         [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
-            endpoint: BookApi.createUser,
+            types: [ CommonAction.REQUEST_START, RECEIVE_CREATE, CommonAction.REQUEST_FAILURE + '_USER' ],
+            endpoint: UserApi.create,
             options: { body:p, method:'POST' }
         }
     }
@@ -54,8 +33,8 @@ export function createUser(p) {
 export function updateUser(p) {
     return {
         [CALL_API]: {
-            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE, CommonAction.REQUEST_FAILURE + 'BOOKEDIT' ],
-            endpoint: BookApi.updateUser,
+            types: [ CommonAction.REQUEST_START, RECEIVE_UPDATE, CommonAction.REQUEST_FAILURE + '_USER' ],
+            endpoint: UserApi.update,
             options: { body:p, method:'POST' }
         }
     }
@@ -69,7 +48,7 @@ const initialState = {
     error:null
 }
 const ACTION_HANDLERS = {
-    [CommonAction.REQUEST_FAILURE + 'BOOKEDIT']: (state, action) => {
+    [CommonAction.REQUEST_FAILURE + '_USER']: (state, action) => {
         return ({ ...state, fetching: false, error: action })
     },
     [RECEIVE_USER] : (state, action) => {
@@ -81,7 +60,7 @@ const ACTION_HANDLERS = {
     [RECEIVE_UPDATE] : (state, action) => {
         return ({ ...state, fetching: false, update: action.response.data, error: null })
     },
-    [CLEAR_BOOKEDIT] : () => {
+    [CLEAR_USER] : () => {
         return ({ ...initialState })
     }
 }

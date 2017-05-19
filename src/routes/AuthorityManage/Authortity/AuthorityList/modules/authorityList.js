@@ -3,6 +3,7 @@ import { CommonAction } from '../../../../../constants/ActionTypes'
 
 const CLEAR_AUTHORITY_LIST = 'CLEAR_AUTHORITY_LIST'
 const RECEIVE_AUTHORITY_LIST = 'RECEIVE_AUTHORITY_LIST'
+const RECEIVE_AUTHORITY_DELETE = 'RECEIVE_AUTHORITY_DELETE'
 import { AuthorityApi } from '../../../../../constants/Api'
 
 export function clearState() {
@@ -19,10 +20,20 @@ export function getAuthorityList(query) {
         }
     }
 }
+export function deleteAuthority(query) {
+    return {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_AUTHORITY_DELETE, CommonAction.REQUEST_FAILURE + 'USER' ],
+            endpoint: AuthorityApi.delete,
+            options: { body: query, method:'POST' }
+        }
+    }
+}
 
 const initialState = {
     fetching:false,
     authorityList:null,
+    delete:null,
     error:null
 }
 const ACTION_HANDLERS = {
@@ -31,6 +42,9 @@ const ACTION_HANDLERS = {
     },
     [RECEIVE_AUTHORITY_LIST] : (state, action) => {
         return ({ ...state, fetching: false, authorityList: action.response.data, error: null })
+    },
+    [RECEIVE_AUTHORITY_DELETE] : (state, action) => {
+        return ({ ...state, fetching: false, delete: action.response, error: null })
     },
     [CLEAR_AUTHORITY_LIST] : () => {
         return ({ ...initialState })

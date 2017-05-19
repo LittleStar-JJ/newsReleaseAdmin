@@ -3,6 +3,7 @@ import { CommonAction } from '../../../../constants/ActionTypes'
 
 const CLEAR_NEWS = 'CLEAR_NEWS'
 const RECEIVE_NEWS_LIST = 'RECEIVE_NEWS_LIST'
+const RECEIVE_NEWS_DELETE = 'RECEIVE_NEWS_DELETE'
 const RECEIVE_CATEGORY_LIST = 'RECEIVE_CATEGORY_LIST'
 import { NewsApi, CategoryApi } from '../../../../constants/Api'
 
@@ -29,10 +30,20 @@ export function getCategorys(query) {
         }
     }
 }
+export function deleteNews(query) {
+    return {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_NEWS_DELETE, CommonAction.REQUEST_FAILURE + 'USER' ],
+            endpoint: NewsApi.delete,
+            options: { body: query, method:'POST' }
+        }
+    }
+}
 
 const initialState = {
     fetching:false,
     news:null,
+    delete:null,
     category:null,
     error:null
 }
@@ -42,6 +53,9 @@ const ACTION_HANDLERS = {
     },
     [RECEIVE_NEWS_LIST] : (state, action) => {
         return ({ ...state, fetching: false, news: action.response.data, error: null })
+    },
+    [RECEIVE_NEWS_DELETE] : (state, action) => {
+        return ({ ...state, fetching: false, delete: action.response, error: null })
     },
     [RECEIVE_CATEGORY_LIST] : (state, action) => {
         return ({ ...state, fetching: false, category: action.response.data, error: null })

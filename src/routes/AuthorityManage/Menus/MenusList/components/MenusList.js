@@ -9,6 +9,7 @@ export default class AuthorityList extends React.Component {
     static propTypes = {
         MenusList: React.PropTypes.object,
         getMenuList: React.PropTypes.func,
+        deleteMenu: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -48,6 +49,11 @@ export default class AuthorityList extends React.Component {
             })
             this.setState({ list: list })
             this.props.clearState()
+        }
+        if (nextProps.MenusList.delete) {
+            message.success('删除成功')
+            this.props.clearState()
+            this.getList()
         }
         if (nextProps.MenusList.error) {
             message.error(nextProps.MenusList.error.error)
@@ -103,14 +109,15 @@ export default class AuthorityList extends React.Component {
                         type:'link',
                         text:'编辑',
                         onClick:(index) => { this.context.router.push('/menuEdit/' + list[index].id) }
-                    },
+                    }/* ,
                     {
                         type:'popConfirm',
                         text:'删除',
                         title:'确定删除吗？',
                         onClick:(index) => {
+                            this.props.deleteMenu({ id:list[index].id })
                         }
-                    }
+                    } */
                 ]
             }
         ]
@@ -132,9 +139,6 @@ export default class AuthorityList extends React.Component {
             <div className="page-container">
                 <div className="page-tabs-query">
                     <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/menuEdit')}>添加菜单</Button>
-                    <div className="page-query">
-                        <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
-                    </div>
                 </div>
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={list} />

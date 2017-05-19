@@ -90,6 +90,15 @@ class ClassifyEdit extends React.Component {
                 onChange:() => {}
             },
             {
+                type:'text',
+                rules:[{ required:true, message:'请输入' }],
+                fieldLabel:'路由地址',
+                fieldName:'router',
+                placeholder:'请输入',
+                initialValue:classifyDetail.router,
+                onChange:() => {}
+            },
+            {
                 type:'switch',
                 fieldLabel:'是否导航',
                 fieldName:'is_nav',

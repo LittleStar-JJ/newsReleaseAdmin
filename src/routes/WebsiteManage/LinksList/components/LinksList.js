@@ -1,10 +1,11 @@
 import React from 'react'
 import { Tabs, Button, message, Modal } from 'antd'
 import moment from 'moment'
-import { CommonStatus } from '../../../../constants/Status'
+import { CommonStatus, BtnOperation } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 import OBOREdit from '../../../../components/OBOREdit'
+import BtnPermission from '../../../../components/BtnPermission'
 import ResponseCode from '../../../../utils/ResponseCode'
 import { LinksApi } from '../../../../constants/Api'
 const config = require('../../../../../config/config.json')[NODE_ENV.toUpperCase()]
@@ -15,6 +16,7 @@ export default class LinksList extends React.Component {
         getLinksList: React.PropTypes.func,
         clearState: React.PropTypes.func,
         createLinks: React.PropTypes.func,
+        deleteLinks: React.PropTypes.func,
         updateLinks: React.PropTypes.func
     }
     static contextTypes = {
@@ -69,6 +71,11 @@ export default class LinksList extends React.Component {
             this.getLinks()
             this.setState({ LinksOne:null })
             this.props.clearState()
+        }
+        if (nextProps.LinksList.delete) {
+            this.props.clearState()
+            message.success('删除成功')
+            this.getLinks()
         }
         if (nextProps.LinksList.error) {
             message.error(nextProps.LinksList.error.error)
@@ -148,6 +155,15 @@ export default class LinksList extends React.Component {
                                 url:_c.icon
                             }]
                             this.setState({ newRandomKeys:Math.random(), modalVisible:true, LinksOne: _c, fileList })
+                        }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteLinks({ id:links[index].id })
                         }
                     }
                 ]
@@ -245,9 +261,11 @@ export default class LinksList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => {
-                        this.setState({ newRandomKeys:Math.random(), modalVisible:true, LinksOne:null, fileList:[] })
-                    }}>友情链接创建</Button>
+                    <BtnPermission type={BtnOperation.添加}>
+                        <Button className="page-top-btns" type="primary" onClick={() => {
+                            this.setState({ newRandomKeys:Math.random(), modalVisible:true, LinksOne:null, fileList:[] })
+                        }}>友情链接创建</Button>
+                    </BtnPermission>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

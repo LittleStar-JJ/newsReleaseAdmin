@@ -2,7 +2,7 @@ import React from 'react'
 import moment from 'moment'
 import { Button, Popconfirm, message, Form, Row, Col } from 'antd'
 import OBOREdit from '../../../../components/OBOREdit'
-import { QuotePlanStatus, genderStatus } from '../../../../constants/Status'
+import { CommonStatus, genderStatus } from '../../../../constants/Status'
 
 class UesrEdit extends React.Component {
     static propTypes = {
@@ -40,6 +40,16 @@ class UesrEdit extends React.Component {
             this.setState({ userDetail: userDetail })
             this.props.clearState()
         }
+        if (nextProps.UesrEdit.create) {
+            message.success('创建成功')
+            this.props.clearState()
+            this.context.router.push('/userList')
+        }
+        if (nextProps.UesrEdit.update) {
+            message.success('修改成功')
+            this.props.clearState()
+            this.context.router.push('/userList')
+        }
         if (nextProps.UesrEdit.error) {
             message.error(nextProps.UesrEdit.error.error)
             this.props.clearState()
@@ -60,7 +70,7 @@ class UesrEdit extends React.Component {
                 type:'text',
                 rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'昵称',
-                disabled:this.state.disabled,
+                disabled:this.id || false,
                 fieldName:'nickName',
                 placeholder:'请输入',
                 initialValue:userDetail.nickName,
@@ -70,20 +80,20 @@ class UesrEdit extends React.Component {
                 type:'text',
                 rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'邮箱',
-                disabled:this.state.disabled,
+                disabled:this.id || false,
                 fieldName:'email',
                 placeholder:'请输入',
                 initialValue:userDetail.email,
                 onChange:() => {}
             },
             {
-                type:'text',
-                rules:[{ required:true, message:'请输入' }],
+                type:'password',
+                rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
                 fieldLabel:'密码',
                 disabled:this.state.disabled,
                 fieldName:'password',
                 placeholder:'请输入',
-                initialValue:userDetail.password,
+                initialValue:'',
                 onChange:() => {}
             },
             {
@@ -93,7 +103,7 @@ class UesrEdit extends React.Component {
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
-                    options:this.convertStatus(QuotePlanStatus),
+                    options:this.convertStatus(CommonStatus),
                     selected:userDetail.status,
                     onChange:(val) => {}
                 },
@@ -103,7 +113,6 @@ class UesrEdit extends React.Component {
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'手机号',
                 disabled:this.state.disabled,
                 fieldName:'phone',
@@ -114,13 +123,12 @@ class UesrEdit extends React.Component {
             {
                 type:'radioButton',
                 disabled:this.state.disabled,
-                rules:[{ required:true, message:'请选择' }],
                 option:{
                     valueField:'id',
                     textField:'name',
                     placeholder:'请选择',
                     options:this.convertStatus(genderStatus),
-                    selected:userDetail.gender ? userDetail.gender.id : 'MALE',
+                    selected:userDetail.gender ? userDetail.gender : 'MALE',
                     onChange:(val) => {}
                 },
                 fieldLabel:'性别',
@@ -128,7 +136,6 @@ class UesrEdit extends React.Component {
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'联系地址',
                 disabled:this.state.disabled,
                 fieldName:'address',
@@ -138,7 +145,6 @@ class UesrEdit extends React.Component {
             },
             {
                 type:'text',
-                rules:[{ required:true, message:'请输入' }],
                 fieldLabel:'QQ',
                 disabled:this.state.disabled,
                 fieldName:'qq',
@@ -148,22 +154,11 @@ class UesrEdit extends React.Component {
             },
             {
                 type:'datePicker',
-                rules:[{ required:true, message:'请选择' }],
                 disabled:this.state.disabled,
                 fieldLabel:'生日',
                 fieldName:'birthday',
-                initialValue:moment(userDetail.birthday),
+                initialValue:userDetail.birthday ? moment(userDetail.birthday).format('YYYY-MM-DD') : '',
                 placeholder:'请选择',
-                onChange:() => {}
-            },
-            {
-                type:'text',
-                rules:[{ required:true, message:'请输入' }],
-                disabled:this.state.disabled,
-                fieldLabel:'积分',
-                fieldName:'integral',
-                placeholder:'请输入',
-                initialValue:userDetail.integral,
                 onChange:() => {}
             },
             {
@@ -177,17 +172,22 @@ class UesrEdit extends React.Component {
                 onChange:() => {}
             }
         ]
-
+        if (this.id) {
+            options[2].fieldLabel = '原始密码'
+            options.splice(3, 0, {
+                type:'password',
+                rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
+                fieldLabel:'新密码',
+                fieldName:'new_password',
+                placeholder:'请输入',
+                initialValue:'',
+                onChange:() => {}
+            })
+        }
         return (
             <div className="page-container page-detail">
                 <div className="page-top-btns">
-                    {
-                        <div>
-                            <Popconfirm title="保存信息不可修改，是否确认？" onConfirm={(e) => { this.save(e) }}>
-                                <Button type="primary">保存</Button>
-                            </Popconfirm>
-                        </div>
-                    }
+                    <Button type="primary" onClick={(e) => { this.save(e) }}>保存</Button>
                 </div>
                 <div style={{ width: '50%' }}>
                     <OBOREdit options={options} colSpan={24} ref="OBOREdit1" />
@@ -198,14 +198,12 @@ class UesrEdit extends React.Component {
 
     save = (e) => {
         this.refs.OBOREdit1.handleValidator(e, (value) => {
-            console.log('fffff', value)
-            value.birthday = value.birthday.format('x')
-            console.log('aaaaaa', value)
+            value.birthday = value.birthday ? value.birthday.format('YYYY-MM-DD') : ''
             if (!this.id) {
-                this.props.createUser({ freightBill:JSON.stringify(book) })
+                this.props.createUser(value)
             } else {
-                book.id = this.id
-                this.props.updateUser({ freightBill:JSON.stringify(book) })
+                value.id = this.id
+                this.props.updateUser(value)
             }
         })
     }

@@ -1,11 +1,12 @@
 import { connect } from 'react-redux'
-import { clearState, getClassifyList } from '../modules/classifyList'
+import { clearState, getClassifyList, deleteClassify } from '../modules/classifyList'
 
 import ClassifyList from '../components/ClassifyList'
 
 const mapDispatchToProps = {
     clearState: () => clearState(),
-    getClassifyList: (query) => getClassifyList(query)
+    getClassifyList: (query) => getClassifyList(query),
+    deleteClassify: (query) => deleteClassify(query)
 }
 
 const mapStateToProps = (state) => ({

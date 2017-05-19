@@ -3,11 +3,13 @@ import { Button, message } from 'antd'
 import moment from 'moment'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
-import { QuotePlanStatus } from '../../../../constants/Status'
+import { QuotePlanStatus, BtnOperation, genderStatus } from '../../../../constants/Status'
+import BtnPermission from '../../../../components/BtnPermission'
 export default class UserList extends React.Component {
     static propTypes = {
         UserList: React.PropTypes.object,
         getUserList: React.PropTypes.func,
+        deleteUser: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -30,9 +32,9 @@ export default class UserList extends React.Component {
         let _datas1 = []
         if (value.createdAt) {
             value.createdAt.forEach((data) => {
-                _datas1.push(data.format('x'))
+                _datas1.push(data.format('YYYY-MM-DD HH:mm:ss'))
             })
-            value.createdAt = _datas1.join('-')
+            value.createdAt = _datas1.join('|')
         }
         this.pageNum = 1
         this.query = value
@@ -50,9 +52,15 @@ export default class UserList extends React.Component {
                 item.createdAt = moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')
                 item.loginTime = moment(item.loginTime).format('YYYY-MM-DD HH:mm:ss')
                 item.statusName = QuotePlanStatus[item.status]
+                item.genderName = genderStatus[item.gender]
             })
             this.setState({ users: users })
             this.props.clearState()
+        }
+        if (nextProps.UserList.delete) {
+            message.success('删除成功')
+            this.props.clearState()
+            this.getUsers()
         }
         if (nextProps.UserList.error) {
             message.error(nextProps.UserList.error.error)
@@ -71,8 +79,8 @@ export default class UserList extends React.Component {
         const queryOptions = [
             {
                 type:'text',
-                fieldLabel:'用户名',
-                fieldName:'adminName',
+                fieldLabel:'昵称',
+                fieldName:'nickName',
                 onChange:() => {}
             },
             {
@@ -113,7 +121,7 @@ export default class UserList extends React.Component {
             },
             {
                 title: '性别', // 标题
-                dataIndex: 'gender.name' // 字段名称
+                dataIndex: 'genderName' // 字段名称
             },
             {
                 title: '创建时间', // 标题
@@ -142,12 +150,22 @@ export default class UserList extends React.Component {
                 btns:[
                     {
                         type:'link',
+                        authority:BtnOperation.编辑,
                         text:'编辑',
                         status:{
                             field:'status',
                             actions: []
                         },
                         onClick:(index) => { this.context.router.push('/userEdit/' + users[index].id) }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteUser({ id:users[index].id })
+                        }
                     }
                 ]
             }
@@ -169,7 +187,9 @@ export default class UserList extends React.Component {
         return (
             <div className="page-container">
                 <div className="page-tabs-query">
-                    <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/userEdit')}>会员创建</Button>
+                    <BtnPermission type={BtnOperation.添加}>
+                        <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/userEdit')}>会员创建</Button>
+                    </BtnPermission>
                     <div className="page-query">
                         <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
                     </div>

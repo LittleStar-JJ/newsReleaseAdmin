@@ -8,6 +8,7 @@ export default class AuthorityList extends React.Component {
     static propTypes = {
         AuthorityList: React.PropTypes.object,
         getAuthorityList: React.PropTypes.func,
+        deleteAuthority: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -45,6 +46,11 @@ export default class AuthorityList extends React.Component {
             })
             this.setState({ authorityList: authorityList })
             this.props.clearState()
+        }
+        if (nextProps.AuthorityList.delete) {
+            message.success('删除成功')
+            this.props.clearState()
+            this.getAuthoritys()
         }
         if (nextProps.AuthorityList.error) {
             message.error(nextProps.AuthorityList.error.error)
@@ -89,6 +95,14 @@ export default class AuthorityList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => { this.context.router.push('/authorityEdit/' + authorityList[index].id) }
+                    },
+                    {
+                        type:'popConfirm',
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteAuthority({ id:authorityList[index].id })
+                        }
                     }
                 ]
             }
@@ -111,9 +125,6 @@ export default class AuthorityList extends React.Component {
             <div className="page-container">
                 <div className="page-tabs-query">
                     <Button className="page-top-btns" type="primary" onClick={() => this.context.router.push('/authorityEdit')}>添加权限</Button>
-                    <div className="page-query">
-                        <QueryList queryOptions={queryOptions} onSearchChange={this.handleSearch} />
-                    </div>
                 </div>
                 <div className="page-tabs-table">
                     <TableGrid columns={gridColumns} dataSource={authorityList} />

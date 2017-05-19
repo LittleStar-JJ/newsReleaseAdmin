@@ -3,6 +3,7 @@ import { CommonAction } from '../../../../constants/ActionTypes'
 
 const CLEAR_CLASSIFY = 'CLEAR_CLASSIFY'
 const RECEIVE_CLASSIFY_LIST = 'RECEIVE_CLASSIFY_LIST'
+const RECEIVE_CLASSIFY_DELETE = 'RECEIVE_CLASSIFY_DELETE'
 import { CategoryApi } from '../../../../constants/Api'
 
 export function clearState() {
@@ -19,10 +20,20 @@ export function getClassifyList(query) {
         }
     }
 }
+export function deleteClassify(query) {
+    return {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_CLASSIFY_DELETE, CommonAction.REQUEST_FAILURE + 'CLEAR_CLASSIFYS' ],
+            endpoint: CategoryApi.delete,
+            options: { body: query, method:'POST' }
+        }
+    }
+}
 
 const initialState = {
     fetching:false,
     list:null,
+    delete:null,
     error:null
 }
 const ACTION_HANDLERS = {
@@ -31,6 +42,9 @@ const ACTION_HANDLERS = {
     },
     [RECEIVE_CLASSIFY_LIST] : (state, action) => {
         return ({ ...state, fetching: false, list: action.response.data, error: null })
+    },
+    [RECEIVE_CLASSIFY_DELETE] : (state, action) => {
+        return ({ ...state, fetching: false, delete: action.response, error: null })
     },
     [CLEAR_CLASSIFY] : () => {
         return ({ ...initialState })

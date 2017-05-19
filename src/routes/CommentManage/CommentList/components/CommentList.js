@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, message } from 'antd'
 import moment from 'moment'
-import { CommentStatus } from '../../../../constants/Status'
+import { CommentStatus, BtnOperation } from '../../../../constants/Status'
 import TableGrid from '../../../../components/TableGrid'
 import QueryList from '../../../../components/QueryList'
 
@@ -9,6 +9,7 @@ export default class ClassifyList extends React.Component {
     static propTypes = {
         CommentList: React.PropTypes.object,
         getCommentList: React.PropTypes.func,
+        deleteComment: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -31,13 +32,11 @@ export default class ClassifyList extends React.Component {
     handleSearch = (value) => {
         let _datas1 = []
         if (value.createdAt) {
-            value.createdTime.forEach((data) => {
-                _datas1.push(data.format('x'))
+            value.createdAt.forEach((data) => {
+                _datas1.push(data.format('YYYY-MM-DD HH:mm:ss'))
             })
-            value.createdTime = _datas1.join('-')
+            value.createdAt = _datas1.join('|')
         }
-        value['user.name'] = value.user.name
-        delete value.user
         this.pageNum = 1
         this.query = value
         this.getComments()
@@ -61,6 +60,11 @@ export default class ClassifyList extends React.Component {
             this.setState({ commentList: commentList })
             this.props.clearState()
         }
+        if (nextProps.CommentList.delete) {
+            this.props.clearState()
+            message.success('删除成功')
+            this.getComments()
+        }
         if (nextProps.CommentList.error) {
             message.error(nextProps.CommentList.error.error)
             this.props.clearState()
@@ -79,7 +83,7 @@ export default class ClassifyList extends React.Component {
             {
                 type:'text',
                 fieldLabel:'用户名',
-                fieldName:'userNickName',
+                fieldName:'nickName',
                 initialValue:'',
                 onChange:() => {}
             },
@@ -143,11 +147,21 @@ export default class ClassifyList extends React.Component {
                     {
                         type:'link',
                         text:'查看',
+                        authority:BtnOperation.查看,
                         status:{
                             field:'status',
                             actions: []
                         },
                         onClick:(index) => { this.context.router.push('/commentEdit/' + commentList[index].id) }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteComment({ id:commentList[index].id })
+                        }
                     }
                 ]
             }

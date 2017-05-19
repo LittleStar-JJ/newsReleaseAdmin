@@ -4,7 +4,7 @@
 import React, { PropTypes } from 'react'
 import Auth from '../utils/Auth'
 
-const permissionBtns = ['CREATE', 'DELETE', 'UPDATE', 'SELECT', 'REVIEW', 'SORT']
+// const permissionBtns = ['CREATE', 'DELETE', 'UPDATE', 'SELECT', 'REVIEW', 'SORT']
 export default class BtnPermission extends React.Component {
     static propTypes = {
         type: PropTypes.string.isRequired,
@@ -20,6 +20,7 @@ export default class BtnPermission extends React.Component {
         })
     }
     render() {
+        // 如果当前按钮类型在权限内
         if (this.permissionBtns.indexOf(this.props.type) > -1) {
             return (
                 this.props.children

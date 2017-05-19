@@ -159,7 +159,9 @@ export class CoreLayout extends BaseLayout {
         Auth.dispatchAuthExpiredAction()
     }
     render() {
+        // 获取当前登录用户
         const user = Auth.getAccount() || {}
+        // 格式菜单结构
         const menuData = this.recursiveMenu((user.Auth || {}).AuthMenu || [])
         // let meuns = lMeuns
         const DropdownMenu = (
@@ -173,6 +175,7 @@ export class CoreLayout extends BaseLayout {
             <div className="ant-layout-aside">
                 <aside className="ant-layout-sider">
                     <div className="ant-layout-logo">&nbsp;</div>
+                    {/* 菜单组件 */}
                     <LeftMenu menus={menuData} mode="inline" />
                     <div className="user-bar">
                         <p>
@@ -194,7 +197,7 @@ export class CoreLayout extends BaseLayout {
                         </div>
                     </div>
                     <div className="ant-layout-footer">
-                        <p className="copyright">OBORCloud 版权所有 © 2016</p>
+                        <p className="copyright">xlj© 2017</p>
                     </div>
                 </div>
             </div>

@@ -10,6 +10,7 @@ export default class NewsList extends React.Component {
         NewsList: React.PropTypes.object,
         getList: React.PropTypes.func,
         getCategorys: React.PropTypes.func,
+        deleteNews: React.PropTypes.func,
         clearState: React.PropTypes.func
     }
     static contextTypes = {
@@ -61,6 +62,11 @@ export default class NewsList extends React.Component {
             this.setState({ category:nextProps.NewsList.category.content })
             this.props.clearState()
         }
+        if (nextProps.NewsList.delete) {
+            this.props.clearState()
+            message.success('删除成功')
+            this.getNews()
+        }
         if (nextProps.NewsList.error) {
             message.error(nextProps.NewsList.error.error)
             this.props.clearState()
@@ -92,7 +98,7 @@ export default class NewsList extends React.Component {
                     onChange:(val) => {}
                 },
                 fieldLabel:'分类',
-                fieldName:'category.id'
+                fieldName:'category_id'
             },
             {
                 type:'text',
@@ -172,6 +178,15 @@ export default class NewsList extends React.Component {
                             actions: []
                         },
                         onClick:(index) => { this.context.router.push('/newsEdit/' + news[index].id) }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteNews({ id:news[index].id })
+                        }
                     }
                 ]
             }

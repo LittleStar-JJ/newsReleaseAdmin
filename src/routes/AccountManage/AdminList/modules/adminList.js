@@ -6,6 +6,7 @@ const RECEIVE_ADMIN_LIST = 'RECEIVE_ADMIN_LIST'
 const RECEIVE_AUTH_LIST = 'RECEIVE_AUTH_LIST'
 const RECEIVE_UPDATE_ADMIN = 'RECEIVE_UPDATE_ADMIN'
 const RECEIVE_CREATE_ADMIN = 'RECEIVE_CREATE_ADMIN'
+const RECEIVE_DELETE_ADMIN = 'RECEIVE_DELETE_ADMIN'
 import { AdminApi, AuthorityApi } from '../../../../constants/Api'
 
 export function clearState() {
@@ -49,6 +50,15 @@ export function updateAdmin(query) {
         }
     }
 }
+export function deleteAdmin(query) {
+    return {
+        [CALL_API]: {
+            types: [ CommonAction.REQUEST_START, RECEIVE_DELETE_ADMIN, CommonAction.REQUEST_FAILURE + 'ADMIN' ],
+            endpoint: AdminApi.delete,
+            options: { body: query, method:'POST' }
+        }
+    }
+}
 
 const initialState = {
     fetching:false,
@@ -56,6 +66,7 @@ const initialState = {
     auths:null,
     create:null,
     update:null,
+    delete:null,
     error:null
 }
 const ACTION_HANDLERS = {
@@ -73,6 +84,9 @@ const ACTION_HANDLERS = {
     },
     [RECEIVE_AUTH_LIST] : (state, action) => {
         return ({ ...state, fetching: false, auths: action.response.data, error: null })
+    },
+    [RECEIVE_DELETE_ADMIN] : (state, action) => {
+        return ({ ...state, fetching: false, delete: action.response, error: null })
     },
     [CLEAR_ADMINS] : () => {
         return ({ ...initialState })

@@ -14,7 +14,8 @@ export default class AdminList extends React.Component {
         clearState: React.PropTypes.func,
         updateAdmin: React.PropTypes.func,
         createAdmin: React.PropTypes.func,
-        getAuthList: React.PropTypes.func
+        getAuthList: React.PropTypes.func,
+        deleteAdmin: React.PropTypes.func
     }
     static contextTypes = {
         router: React.PropTypes.object.isRequired
@@ -41,10 +42,10 @@ export default class AdminList extends React.Component {
     handleSearch = (value) => {
         let _data1 = []
         if (value.createdAt) {
-            value.createdTime.forEach((data) => {
-                _data1.push(data.format('x'))
+            value.createdAt.forEach((data) => {
+                _data1.push(data.format('YYYY-MM-DD HH:mm:ss'))
             })
-            value.createdTime = _data1.join('-')
+            value.createdAt = _data1.join('|')
         }
         this.pageNum = 1
         this.query = value
@@ -87,6 +88,11 @@ export default class AdminList extends React.Component {
             this.getAdmins()
             this.props.clearState()
         }
+        if (nextProps.AdminList.delete) {
+            this.props.clearState()
+            message.success('删除成功')
+            this.getAdmins()
+        }
     }
     translateStatus = (status) => {
         return Object.keys(status).map((key) => {
@@ -105,7 +111,7 @@ export default class AdminList extends React.Component {
                 onChange:() => {}
             },
             {
-                type:'text',
+                type:'email',
                 fieldLabel:'邮箱',
                 fieldName:'email',
                 initialValue:'',
@@ -122,7 +128,7 @@ export default class AdminList extends React.Component {
                     onChange:(val) => {}
                 },
                 fieldLabel:'权限',
-                fieldName:'auth'
+                fieldName:'auth_id'
             },
             {
                 type:'select',
@@ -185,6 +191,15 @@ export default class AdminList extends React.Component {
                         onClick:(index) => {
                             this.setState({ modalVisible:true, AdminOne: admins[index], newRandomKeys:Math.random() })
                         }
+                    },
+                    {
+                        type:'popConfirm',
+                        authority:BtnOperation.删除,
+                        text:'删除',
+                        title:'确定删除吗？',
+                        onClick:(index) => {
+                            this.props.deleteAdmin({ id:admins[index].id })
+                        }
                     }
                 ]
             }
@@ -193,6 +208,7 @@ export default class AdminList extends React.Component {
         const modalOption = [
             {
                 type:'text',
+                rules:[{ required:true, message:'请输入用户名' }],
                 fieldLabel:'用户名',
                 fieldName:'adminName',
                 initialValue:AdminOne.adminName,
@@ -200,6 +216,7 @@ export default class AdminList extends React.Component {
             },
             {
                 type:'text',
+                rules:[{ required:true, message:'请输入邮箱' }, { type: 'email', message: '请输入正确的邮箱' }],
                 fieldLabel:'邮箱',
                 fieldName:'email',
                 initialValue:AdminOne.email,
@@ -207,6 +224,7 @@ export default class AdminList extends React.Component {
             },
             {
                 type:'text',
+                rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
                 fieldLabel:'密码',
                 fieldName:'password',
                 initialValue:'',
@@ -214,6 +232,7 @@ export default class AdminList extends React.Component {
             },
             {
                 type:'select',
+                rules:[{ required:true, message:'请选择权限' }],
                 option:{
                     valueField:'id',
                     textField:'name',
@@ -227,6 +246,7 @@ export default class AdminList extends React.Component {
             },
             {
                 type:'select',
+                rules:[{ required:true, message:'请选择状态' }],
                 option:{
                     valueField:'id',
                     textField:'name',
@@ -241,8 +261,9 @@ export default class AdminList extends React.Component {
         ]
         if (this.state.AdminOne) {
             modalOption[2].fieldLabel = '原始密码'
-            modalOption.splice(2, 0, {
+            modalOption.splice(3, 0, {
                 type:'text',
+                rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
                 fieldLabel:'新密码',
                 fieldName:'new_password',
                 initialValue:'',
