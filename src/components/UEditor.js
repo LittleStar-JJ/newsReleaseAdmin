@@ -2,6 +2,8 @@
  * Created by xwatson on 2017/5/13.
  */
 import React from 'react'
+import auth from '../utils/Auth'
+const config = require('../../config/config.json')[NODE_ENV.toUpperCase()]
 
 export default class UEditor extends React.Component {
     static propTypes = {
@@ -10,6 +12,7 @@ export default class UEditor extends React.Component {
     constructor(props) {
         super(props)
         this.ue = null
+        this.user = auth.getAccount()
     }
     render() {
         return (
@@ -23,6 +26,7 @@ export default class UEditor extends React.Component {
         }
         setTimeout(() => {
             this.ue = window.UE.getEditor('editor-content', {
+                serverUrl:`${config.apiHost}/news_admin/editor/upload?authToken=${this.user.authToken}`,
                 // 配置显示功能按钮
                 toolbars:[
                     [
