@@ -211,6 +211,7 @@ class NewsEdit extends React.Component {
             },
             {
                 type:'file',
+                rules:[{ required:true, message:'请上传缩略图' }],
                 fieldLabel:'缩略图',
                 uploadProps:{
                     name: 'file',
