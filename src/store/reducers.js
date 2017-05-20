@@ -3,12 +3,12 @@
  */
 import { combineReducers } from 'redux'
 import locationReducer from './location'
-// import actions from '../actions'
+import actions from '../actions'
 
 export const makeRootReducer = (asyncReducers) => {
     return combineReducers({
         location: locationReducer,
-        // ...actions,
+        ...actions,
         ...asyncReducers
     })
 }

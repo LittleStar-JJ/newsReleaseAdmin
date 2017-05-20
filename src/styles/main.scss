@@ -1,3 +1,12 @@
+
+.bg-split{
+  width: 106%;
+  height: 20px;
+  background: #f4f4f4;
+  position: relative;
+  left: -24px;
+  right: -24px;
+}
 .loading-bar{
   display: block;
   position: fixed;
@@ -40,11 +49,30 @@
 .page-detail-left{
   float: left;
   width: 28%;
-  border-right: 3px solid #f4f4f4;
   padding-right: 20px;
 }
 .page-detail-right{
   width: 70%;
   float: left;
+  min-height: 650px;
+  border-left: 3px solid #f4f4f4;
   padding-left: 40px;
+}
+//分页元素清除浮动
+.ant-spin-container {
+  overflow: auto;
+}
+.loading-spin,.ant-spin-nested-loading, .ant-spin-container{
+  height: 100%;
+}
+.ant-spin{
+  min-height: 100%;
+}
+.loading-spin-refresh {
+  position: fixed;
+  z-index: 999;
+  top:50%;
+  left:50%;
+  margin-left: -15px;
+  margin-top: 24px;
 }

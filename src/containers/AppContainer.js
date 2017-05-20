@@ -6,6 +6,7 @@ import { message } from 'antd'
 import { browserHistory, Router } from 'react-router'
 import { Provider } from 'react-redux'
 import LoadingBar from '../components/LoadingBar'
+import LoadingSpin from '../components/LoadingSpin'
 import Auth from '../utils/Auth'
 const config = require('../../config/config.json')
 const reg = /^\/(\w+)\/?/
@@ -35,7 +36,9 @@ class AppContainer extends Component {
             <Provider store={store}>
                 <div style={{ height: '100%' }}>
                     <LoadingBar />
-                    <Router history={browserHistory} children={routes} />
+                    <LoadingSpin>
+                        <Router history={browserHistory} children={routes} />
+                    </LoadingSpin>
                 </div>
             </Provider>
         )

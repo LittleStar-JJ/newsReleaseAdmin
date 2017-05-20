@@ -13,7 +13,7 @@ class LoadingBar extends React.Component {
         this.timer = null
         this.timerOut = null
         this.speed = 500
-        this.isUnmount = false
+        this.isLoading = false
     }
     state = {
         style: {
@@ -21,13 +21,10 @@ class LoadingBar extends React.Component {
             width:'0%'
         }
     }
-    componentWillMount() {
-        this.isUnmount = false
-    }
     componentWillReceiveProps(nextProps) {
-        clearTimeout(this.timerOut)
-        if (nextProps.loading.status) {
+        if (nextProps.loading.count > 0 && !this.isLoading) {
             clearInterval(this.timer)
+            clearTimeout(this.timerOut)
             let progress = 0
             this.setState({ style: { width:'0.5%', display:'block' } })
             this.timer = setInterval(() => {
@@ -37,24 +34,21 @@ class LoadingBar extends React.Component {
                     clearInterval(this.timer)
                 }
             }, this.speed)
-        } else {
+            this.isLoading = true
+        } else if (!nextProps.loading.count && this.isLoading) {
             clearInterval(this.timer)
             this.setState({ style: Object.assign({}, this.state.style, { width: '100%' }) })
             // 等待动画播放完成
             this.timerOut = setTimeout(() => {
-                if (!this.isUnmount) {
-                    this.setState({ style: Object.assign({}, this.state.style, { display: 'none', width:'0', transition:'initial', WebkitTransition:'initial' }) })
-                }
-            }, 490)
+                this.setState({ style: Object.assign({}, this.state.style, { display: 'none', width:'0', transition:'initial', WebkitTransition:'initial' }) })
+            }, 600)
+            this.isLoading = false
         }
     }
     render() {
         return (
             <div className="loading-bar" style={this.state.style}>&nbsp;</div>
         )
-    }
-    componentWillUnmount() {
-        this.isUnmount = true
     }
 }
 
