@@ -104,7 +104,7 @@ class SiteConfig extends React.Component {
             {
                 type:'textArea',
                 style:{ height:'60px' },
-                fieldLabel:'统计代码',
+                fieldLabel:'底部代码',
                 disabled:this.state.disabled,
                 fieldName:'statisticsCode',
                 placeholder:'请输入',
