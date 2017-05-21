@@ -223,8 +223,8 @@ export default class AdminList extends React.Component {
                 onChange:() => {}
             },
             {
-                type:'text',
-                rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
+                type:'password',
+                rules:[{ required:true, message:'请输入密码' }, { validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
                 fieldLabel:'密码',
                 fieldName:'password',
                 initialValue:'',
