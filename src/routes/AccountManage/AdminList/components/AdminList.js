@@ -261,6 +261,7 @@ export default class AdminList extends React.Component {
         ]
         if (this.state.AdminOne) {
             modalOption[2].fieldLabel = '原始密码'
+            modalOption[2].rules = [{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }]
             modalOption.splice(3, 0, {
                 type:'text',
                 rules:[{ validate:'reg=^.{6,}$', message:'请输入6位以上密码' }],
